@@ -26,7 +26,7 @@
 #include <boost/filesystem.hpp>
 
 using std::string;
-namespace fs = boost::filesystem3;
+namespace fs = boost::filesystem;
 
 //
 // Singleton instance.

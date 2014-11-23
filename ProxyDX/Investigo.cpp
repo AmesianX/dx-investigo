@@ -25,7 +25,7 @@
 #include <psapi.h>
 
 using namespace boost::algorithm;
-using namespace boost::filesystem3;
+using namespace boost::filesystem;
 using std::map;
 using std::string;
 

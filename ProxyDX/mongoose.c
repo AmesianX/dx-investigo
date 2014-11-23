@@ -468,7 +468,7 @@ struct mg_context {
   pthread_cond_t sq_empty;   // Signaled when socket is consumed
 
   // Handle to the master thread, to know when it is finished.
-  int thread_handle;
+  void* thread_handle;
 };
 
 struct mg_connection {
@@ -4253,7 +4253,7 @@ struct mg_context *mg_start(mg_callback_t user_callback, void *user_data,
   (void) pthread_cond_init(&ctx->sq_full, NULL);
 
   // Start master (listening) thread
-  ctx->thread_handle = start_thread(ctx, (mg_thread_func_t) master_thread, ctx);
+  ctx->thread_handle = (void *)start_thread(ctx, (mg_thread_func_t) master_thread, ctx);
 
   // Start worker threads
   for (i = 0; i < atoi(ctx->config[NUM_THREADS]); i++) {
