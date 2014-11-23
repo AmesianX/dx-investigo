@@ -1,0 +1,16 @@
+EXPORTS
+D3DPERF_BeginEvent=__E__0__ @4
+D3DPERF_EndEvent=__E__1__ @5
+D3DPERF_GetStatus=__E__2__ @6
+D3DPERF_QueryRepeatFrame=__E__3__ @7
+D3DPERF_SetMarker=__E__4__ @8
+D3DPERF_SetOptions=__E__5__ @9
+D3DPERF_SetRegion=__E__6__ @10
+DebugSetLevel=__E__7__ @11
+DebugSetMute=__E__8__ @12
+Direct3DCreate9=__E__9__ @13
+Direct3DCreate9Ex=__E__10__ @14
+Direct3DShaderValidatorCreate9=__E__11__ @1
+PSGPError=__E__12__ @2
+PSGPSampleTexture=__E__13__ @3
+GetApplicationInterface @20

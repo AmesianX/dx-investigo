@@ -1,0 +1,28 @@
+
+
+/*
+A style for centering elements.
+*/
+.center {
+    text-align: center;
+}
+
+.left_panel {
+    float: left;
+}
+
+.right_panel {
+    float: right;
+}
+
+.clear {
+	clear: both;
+}
+
+.page_content {
+}
+
+.align_text_right {
+	text-align: right;
+}
+

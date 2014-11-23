@@ -1,0 +1,100 @@
+﻿<!--
+
+https://developers.google.com/chart/
+https://google-developers.appspot.com/chart/interactive/docs/quick_start
+https://google-developers.appspot.com/chart/interactive/docs/gallery/linechart
+
+-->
+
+<html>
+  <head>
+	<title>Investigo Performance Report</title>
+
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="@Model.GraphDataJavascriptFile"></script>
+    <script type="text/javascript">
+
+        var data_array = @Model.GraphDataVariable;
+
+        var init = function() {
+
+            var body = $('#body');
+
+            var draw_chart = function (chart_data) {
+                var data = google.visualization.arrayToDataTable(chart_data.data);
+
+                var pixels_per_frame = 1;
+                var chart_width = chart_data.num_frames * pixels_per_frame;
+                var num_frames_per_minor_gridline = 100;
+                var num_minor_horiz_gridlines = chart_data.num_frames / num_frames_per_minor_gridline;
+                var num_frames_per_major_gridline = 500;
+                var num_major_horiz_gridlines = chart_data.num_frames / num_frames_per_major_gridline;
+
+                var options = {
+                    title: chart_data.name,
+                    legend: {
+                        position: 'none'
+                    },
+                    width: chart_width,
+                    chartArea: {
+                        left: 50,
+                        top: 50
+                    },
+                    hAxis: {
+                        gridlines: {
+                            count: num_major_horiz_gridlines
+                        },
+                        minorGridlines: {
+                            count: num_minor_horiz_gridlines
+                        },
+                        textStyle: {
+                            fontSize: 15
+                        }
+                    },
+                    vAxis: {
+                        textStyle: {
+                            fontSize: 12
+                        }                        
+                    },
+                    titleTextStyle: {
+                        fontSize: 18
+                    },
+                    series: [
+                        {
+                            lineWidth: 1.5
+                        }
+                    ]
+                };
+
+                var chartDiv = $('<div class="chart" style="height: 250px;"></div>')
+                body.append(chartDiv);
+
+                var chart = new google.visualization.LineChart(chartDiv.get(0));
+                chart.draw(data, options);
+            }
+
+            for (var i = 0; i < data_array.length; ++i) {
+                draw_chart(data_array[i]);
+            }
+        }
+
+        google.load("visualization", "1", { packages: ["corechart"] });
+        google.setOnLoadCallback(init);
+    </script>
+  </head>
+  <body id="body">
+    <h1>Investigo Performance Report</h1>
+
+    <div id="reports">
+        @foreach (var report in Model.Reports) {
+            <ul>
+                <li><a href="@report">@report</a></li>
+            </ul>
+        }
+    </div>	
+
+    <div id="graphs">
+    </div>
+  </body>
+</html>

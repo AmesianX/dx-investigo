@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="ProxyIDirect3DDevice9.cpp" />
+    <ClCompile Include="ProxyIDirect3D9.cpp" />
+    <ClCompile Include="ProxyIDirect3DSurface9.cpp" />
+    <ClCompile Include="ProxyIDirect3DPixelShader9.cpp" />
+    <ClCompile Include="ProxyIDirect3DQuery9.cpp" />
+    <ClCompile Include="ProxyIDirect3DStateBlock9.cpp" />
+    <ClCompile Include="ProxyIDirect3DSwapChain9.cpp" />
+    <ClCompile Include="ProxyIDirect3DTexture9.cpp" />
+    <ClCompile Include="ProxyIDirect3DVertexBuffer9.cpp" />
+    <ClCompile Include="ProxyIDirect3DVertexDeclaration9.cpp" />
+    <ClCompile Include="ProxyIDirect3DVertexShader9.cpp" />
+    <ClCompile Include="ProxyIDirect3DVolumeTexture9.cpp" />
+    <ClCompile Include="ProxyIDirect3DBaseTexture9.cpp" />
+    <ClCompile Include="ProxyIDirect3DCubeTexture9.cpp" />
+    <ClCompile Include="ProxyIDirect3DIndexBuffer9.cpp" />
+    <ClCompile Include="D3DErrHelper.cpp" />
+    <ClCompile Include="DllMain.cpp" />
+    <ClCompile Include="DLLResourceManager.cpp" />
+    <ClCompile Include="DXHttpServer.cpp" />
+    <ClCompile Include="HttpServer.cpp" />
+    <ClCompile Include="mongoose.c" />
+    <ClCompile Include="VariablePage.cpp" />
+    <ClCompile Include="VariableManager.cpp" />
+    <ClCompile Include="Variable.cpp" />
+    <ClCompile Include="DXStateUtils.cpp" />
+    <ClCompile Include="jsonstream.cpp" />
+    <ClCompile Include="Investigo.cpp" />
+    <ClCompile Include="PerformanceLog.cpp" />
+    <ClCompile Include="HistoryBuffer.cpp" />
+    <ClCompile Include="VariableGroup.cpp" />
+    <ClCompile Include="ConfigFile.cpp" />
+    <ClCompile Include="InvestigoResource.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ProxyIDirect3DDevice9.h" />
+    <ClInclude Include="ProxyIDirect3D9.h" />
+    <ClInclude Include="ProxyIDirect3DSurface9.h" />
+    <ClInclude Include="ProxyIDirect3DBaseTexture9.h" />
+    <ClInclude Include="ProxyIDirect3DCubeTexture9.h" />
+    <ClInclude Include="ProxyIDirect3DIndexBuffer9.h" />
+    <ClInclude Include="ProxyIDirect3DPixelShader9.h" />
+    <ClInclude Include="ProxyIDirect3DQuery9.h" />
+    <ClInclude Include="ProxyIDirect3DStateBlock9.h" />
+    <ClInclude Include="ProxyIDirect3DSwapChain9.h" />
+    <ClInclude Include="ProxyIDirect3DTexture9.h" />
+    <ClInclude Include="ProxyIDirect3DVertexBuffer9.h" />
+    <ClInclude Include="ProxyIDirect3DVertexDeclaration9.h" />
+    <ClInclude Include="ProxyIDirect3DVertexShader9.h" />
+    <ClInclude Include="ProxyIDirect3DVolumeTexture9.h" />
+    <ClInclude Include="D3DErrHelper.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="DLLResourceManager.h" />
+    <ClInclude Include="DXHttpServer.h" />
+    <ClInclude Include="HttpServer.h" />
+    <ClInclude Include="mongoose.h" />
+    <ClInclude Include="VariableManager.h" />
+    <ClInclude Include="VariablePage.h" />
+    <ClInclude Include="Variable.h" />
+    <ClInclude Include="VariableValue.h" />
+    <ClInclude Include="Timer.h" />
+    <ClInclude Include="DXStateUtils.h" />
+    <ClInclude Include="jsonstream.h" />
+    <ClInclude Include="InvestigoApplicationInterface.h" />
+    <ClInclude Include="Investigo.h" />
+    <ClInclude Include="PerformanceLog.h" />
+    <ClInclude Include="HistoryBuffer.h" />
+    <ClInclude Include="VariableGroup.h" />
+    <ClInclude Include="ConfigFile.h" />
+    <ClInclude Include="InvestigoResource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="UI\global.css">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\global.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\jquery.tmpl.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\page.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\app.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\performance_page.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\performance_sub_page.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\UI.html">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\Graph.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\inspector_page.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\jquery-mobile-fluid960.css">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\jquery.mobile-1.1.0.min.css">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\jquery.mobile-1.1.0.min.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\jquery-1.7.1.min.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\config_page.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\data_manager.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\images\ajax-loader.png">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\images\icons-18-black.png">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\images\icons-36-white.png">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\images\icons-18-white.png">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\images\icons-36-black.png">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\jquery.treeTable.css">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\toggle-collapse-dark.png">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\toggle-expand-light.png">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\toggle-collapse-light.png">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\toggle-expand-dark.png">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\jquery.treeTable.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\lodash.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="Investigo.def" />
+    <None Include="Investigo.cfg" />
+    <None Include="UI\debugger_page.js">
+      <Filter>UI</Filter>
+    </None>
+    <None Include="UI\utils.js">
+      <Filter>UI</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="UI">
+      <UniqueIdentifier>{f2b7fd6f-0c1a-4ee1-88b1-4df7580d815f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Investigo.rc" />
+  </ItemGroup>
+</Project>

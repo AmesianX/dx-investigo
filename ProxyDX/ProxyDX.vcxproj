@@ -1,0 +1,251 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{02EB97D5-B1C5-411E-8274-83A95985DE6F}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>ProxyDX</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <UseOfAtl>false</UseOfAtl>
+    <CLRSupport>false</CLRSupport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <CLRSupport>false</CLRSupport>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\obj\Debug\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\bin\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\obj\Release\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>INVESTIGO_ENABLED;WIN32;_DEBUG;_WINDOWS;_USRDLL;PROXYDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)boost_1_47</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;4229</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Psapi.lib;Kernel32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(SolutionDir)..\..\ShadowMap2\Debug\d3d9.dll</OutputFile>
+      <ModuleDefinitionFile>Investigo.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)proxydll.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>$(OutDir)proxydll.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <DataExecutionPrevention>false</DataExecutionPrevention>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <LargeAddressAware>true</LargeAddressAware>
+      <AdditionalLibraryDirectories>$(SolutionDir)boost_1_47\lib</AdditionalLibraryDirectories>
+    </Link>
+    <PreBuildEvent>
+      <Message>
+      </Message>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>INVESTIGO_ENABLED;WIN32;NDEBUG;_WINDOWS;_USRDLL;PROXYDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)boost_1_47</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;4229</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Psapi.lib;Kernel32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)d3d9.dll</OutputFile>
+      <ModuleDefinitionFile>Investigo.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <ImportLibrary>$(OutDir)proxydll.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <DataExecutionPrevention>false</DataExecutionPrevention>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <LargeAddressAware>true</LargeAddressAware>
+      <AdditionalLibraryDirectories>$(SolutionDir)boost_1_47\lib</AdditionalLibraryDirectories>
+    </Link>
+    <PreBuildEvent>
+      <Message>
+      </Message>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="ConfigFile.cpp" />
+    <ClCompile Include="D3DErrHelper.cpp" />
+    <ClCompile Include="DllMain.cpp" />
+    <ClCompile Include="DLLResourceManager.cpp" />
+    <ClCompile Include="DXStateUtils.cpp" />
+    <ClCompile Include="HistoryBuffer.cpp" />
+    <ClCompile Include="HttpServer.cpp" />
+    <ClCompile Include="jsonstream.cpp" />
+    <ClCompile Include="mongoose.c" />
+    <ClCompile Include="PerformanceLog.cpp" />
+    <ClCompile Include="InvestigoResource.cpp" />
+    <ClCompile Include="DXHttpServer.cpp" />
+    <ClCompile Include="ProxyIDirect3D9.cpp" />
+    <ClCompile Include="ProxyIDirect3DBaseTexture9.cpp" />
+    <ClCompile Include="ProxyIDirect3DCubeTexture9.cpp" />
+    <ClCompile Include="ProxyIDirect3DDevice9.cpp" />
+    <ClCompile Include="Investigo.cpp" />
+    <ClCompile Include="ProxyIDirect3DIndexBuffer9.cpp" />
+    <ClCompile Include="ProxyIDirect3DPixelShader9.cpp" />
+    <ClCompile Include="ProxyIDirect3DQuery9.cpp" />
+    <ClCompile Include="ProxyIDirect3DStateBlock9.cpp" />
+    <ClCompile Include="ProxyIDirect3DSurface9.cpp" />
+    <ClCompile Include="ProxyIDirect3DSwapChain9.cpp" />
+    <ClCompile Include="ProxyIDirect3DTexture9.cpp" />
+    <ClCompile Include="ProxyIDirect3DVertexBuffer9.cpp" />
+    <ClCompile Include="ProxyIDirect3DVertexDeclaration9.cpp" />
+    <ClCompile Include="ProxyIDirect3DVertexShader9.cpp" />
+    <ClCompile Include="ProxyIDirect3DVolumeTexture9.cpp" />
+    <ClCompile Include="Variable.cpp" />
+    <ClCompile Include="VariableGroup.cpp" />
+    <ClCompile Include="VariableManager.cpp" />
+    <ClCompile Include="VariablePage.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Investigo.cfg" />
+    <None Include="UI\app.js" />
+    <None Include="UI\config_page.js" />
+    <None Include="UI\data_manager.js" />
+    <None Include="UI\debugger_page.js" />
+    <None Include="UI\global.css" />
+    <None Include="UI\global.js" />
+    <None Include="UI\Graph.js" />
+    <None Include="UI\images\ajax-loader.png" />
+    <None Include="UI\images\icons-18-black.png" />
+    <None Include="UI\images\icons-18-white.png" />
+    <None Include="UI\images\icons-36-black.png" />
+    <None Include="UI\images\icons-36-white.png" />
+    <None Include="UI\inspector_page.js" />
+    <None Include="UI\jquery-1.7.1.min.js" />
+    <None Include="UI\jquery-mobile-fluid960.css" />
+    <None Include="UI\jquery.mobile-1.1.0.min.css" />
+    <None Include="UI\jquery.mobile-1.1.0.min.js" />
+    <None Include="UI\jquery.tmpl.js" />
+    <None Include="UI\jquery.treeTable.css" />
+    <None Include="UI\jquery.treeTable.js" />
+    <None Include="UI\lodash.js" />
+    <None Include="UI\page.js" />
+    <None Include="UI\performance_page.js" />
+    <None Include="UI\performance_sub_page.js" />
+    <None Include="UI\toggle-collapse-dark.png" />
+    <None Include="UI\toggle-collapse-light.png" />
+    <None Include="UI\toggle-expand-dark.png" />
+    <None Include="UI\toggle-expand-light.png" />
+    <None Include="UI\UI.html" />
+    <None Include="UI\utils.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ConfigFile.h" />
+    <ClInclude Include="DXStateUtils.h" />
+    <ClInclude Include="HistoryBuffer.h" />
+    <ClInclude Include="jsonstream.h" />
+    <ClInclude Include="PerformanceLog.h" />
+    <ClInclude Include="Variable.h" />
+    <ClInclude Include="VariableGroup.h" />
+    <ClInclude Include="VariableManager.h" />
+    <ClInclude Include="VariablePage.h" />
+    <ClInclude Include="VariableValue.h" />
+    <None Include="Investigo.def" />
+    <ClInclude Include="D3DErrHelper.h" />
+    <ClInclude Include="DLLResourceManager.h" />
+    <ClInclude Include="HttpServer.h" />
+    <ClInclude Include="mongoose.h" />
+    <ClInclude Include="InvestigoResource.h" />
+    <ClInclude Include="DXHttpServer.h" />
+    <ClInclude Include="InvestigoApplicationInterface.h" />
+    <ClInclude Include="ProxyIDirect3D9.h" />
+    <ClInclude Include="ProxyIDirect3DBaseTexture9.h" />
+    <ClInclude Include="ProxyIDirect3DCubeTexture9.h" />
+    <ClInclude Include="ProxyIDirect3DDevice9.h" />
+    <ClInclude Include="Investigo.h" />
+    <ClInclude Include="ProxyIDirect3DIndexBuffer9.h" />
+    <ClInclude Include="ProxyIDirect3DPixelShader9.h" />
+    <ClInclude Include="ProxyIDirect3DQuery9.h" />
+    <ClInclude Include="ProxyIDirect3DStateBlock9.h" />
+    <ClInclude Include="ProxyIDirect3DSurface9.h" />
+    <ClInclude Include="ProxyIDirect3DSwapChain9.h" />
+    <ClInclude Include="ProxyIDirect3DTexture9.h" />
+    <ClInclude Include="ProxyIDirect3DVertexBuffer9.h" />
+    <ClInclude Include="ProxyIDirect3DVertexDeclaration9.h" />
+    <ClInclude Include="ProxyIDirect3DVertexShader9.h" />
+    <ClInclude Include="ProxyIDirect3DVolumeTexture9.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Timer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Investigo.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

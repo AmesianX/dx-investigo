@@ -1,0 +1,426 @@
+<!DOCTYPE html> 
+<html> 
+    <head> 
+    <title>Investigo</title> 
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+
+    <link rel="stylesheet" href="jquery.mobile-1.1.0.min.css" type="text/css" />
+    <link rel="stylesheet" href="jquery-mobile-fluid960.css" type="text/css" />
+    <link rel="stylesheet" href="jquery.treeTable.css" type="text/css" />
+    <link rel="stylesheet" href="global.css" type="text/css" />
+
+    <script type="text/javascript" src="lodash.js"></script>
+    <script type="text/javascript" src="jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="jquery.treeTable.js"></script>
+    <script type="text/javascript" src="jquery.tmpl.js"></script>
+    <script type="text/javascript" src="test_data.js"></script>
+    <script type="text/javascript" src="test_variable_history.js"></script>
+    <script type="text/javascript" src="test_config.js"></script>
+    <script type="text/javascript" src="test_breakpoints.js"></script>
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="graph.js"></script>
+    <script type="text/javascript" src="page.js"></script>
+    <script type="text/javascript" src="performance_page.js"></script>
+    <script type="text/javascript" src="performance_sub_page.js"></script>
+    <script type="text/javascript" src="inspector_page.js"></script>
+    <script type="text/javascript" src="debugger_page.js"></script>
+    <script type="text/javascript" src="config_page.js"></script>
+    <script type="text/javascript" src="data_manager.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="global.js"></script>
+    <script type="text/javascript" src="jquery.mobile-1.1.0.min.js"></script>
+
+    <!-- Template for a page header. -->
+    <script type="text/x-jquery-tmpl" id="header_template">
+        <div data-role="header" data-position="fixed" class="header"> 
+            <h1>DX9 Performance & Debugging</h1>
+
+            <!--
+            <div data-role="controlgroup" data-type="horizontal" class="ui-btn-left">
+                <a id="take_screenshot" data-role="button">Screenshot</a>
+            </div>
+
+            <div data-role="controlgroup" data-type="horizontal" class="ui-btn-right">
+                <a href="#help" data-role="button" data-icon="info">Help</a>
+            </div>
+            -->
+
+            <div data-role="controlgroup" data-type="horizontal" class="ui-btn-left">
+                <a href="http://sourceforge.net/donate/?user_id=3127940">
+                    <img src="http://images.sourceforge.net/images/project-support.jpg">
+                </a>
+            </div>
+
+            <div data-role="controlgroup" data-type="horizontal" class="ui-btn-right">
+                <a class="performance_logging" data-role="button">
+                    <span class="ui-btn-text">Start Performance Logging</span>
+                </a>
+                <a class="toggle_draw_calls" data-role="button">
+                    <span class="ui-btn-text">Disable Draw Calls</span>
+                </a>
+            </div>
+        </div>
+    </script>
+
+    <!-- Template for a page footer. -->
+    <script type="text/x-jquery-tmpl" id="footer_template">
+        <div data-role="footer" class="center" data-position="fixed" data-id="persistent">
+            <strong>Developed by Ashley Davis</strong>
+        </div> 
+    </script>
+
+    <!-- Template for breadcrumb trail. -->
+    <script type="text/x-jquery-tmpl" id="breadcrumb_template">
+        <div data-role="controlgroup" data-type="horizontal" data-mini="true">
+            {{each breadcrumbs}}
+                <a href="#${$value.page_name}" data-role="button" data-transition="none" data-direction="reverse">${$value.page_title}</a>
+            {{/each}}
+            <a href="#" data-role="button" class="ui-btn-active">${title}</a>
+        </div>
+    </script>
+
+    <!-- Template for navbar. -->
+    <script type="text/x-jquery-tmpl" id="navbar_template">
+        <div data-role="controlgroup" 
+            data-type="horizontal"  
+            align="center"
+            >
+            <a href="#home" data-role="button" class="home" data-transition="none">Home</a>
+            <a href="#config" data-role="button" class="config" data-transition="none">Config</a>
+            <a href="#performance" data-role="button" class="performance" data-transition="none">Performance</a>
+            <a href="#debugger" data-role="button" class="debugger" data-transition="none">Debugger</a>
+            <!--
+            <a href="#inspector" data-role="button" class="inspector" data-transition="none">Inspector</a>
+            <a href="#frame_analysis" data-role="button" class="frame_analysis" data-transition="none">Frame Analysis</a>
+            <a href="#resources" data-role="button" class="resources" data-transition="none">Resources</a>
+            <a href="#output" data-role="button" class="output" data-transition="none">Output</a>
+            -->
+            <a href="#about" data-role="button" class="about" data-transition="none">About</a>
+        </div>
+    </script>
+
+    <!-- Template for a performance-page. -->
+    <script type="text/x-jquery-tmpl" id="performance_page_template">
+        <div data-role="page" id='${name}'> 
+
+            <div data-role="content" id="${name}_content" >
+
+                <div class="page_content">
+
+                    <div class="variables_content">
+                    </div>
+                </div>
+            </div>
+
+        </div>     
+    </script>
+
+    <!-- Template for sub-page list. -->
+    <script type="text/x-jquery-tmpl" id="page_list_template">
+        <div data-role="controlgroup">
+            <ul class='pages_list' data-role="listview" data-inset="true" data-filter="true">
+            </ul>        
+        </div>
+    </script>
+
+    <!-- Template for an item in a sub-page list. -->
+    <script type="text/x-jquery-tmpl" id="page_list_item_template">
+        <li><a href="#${id}" data-transition="none">${name}</a></li>
+    </script>
+
+    <!-- Template for a variable. -->
+    <script type="text/x-jquery-tmpl" id="variable_template">
+        <p id="${graph_id}_label"><strong>${name}</strong></p>
+        <p>
+        <canvas id="${graph_id}" width="600px" height="80px"></canvas>
+        </p>
+    </script>
+
+    <!-- Templates for inspector page. -->
+
+    <script type="text/x-jquery-tmpl" id="inspector_running_template">
+        
+        <div class="container_12">
+            <div class="grid_1">
+                <label for="inspector_status" style="margin: 8px 0 0 0;">Status:</label>
+            </div>
+            <div class="grid_5">
+                <input id="inspector_status" type="text" value="${inspector_status}" readonly  />
+            </div>     
+        </div>
+
+        <div class="container_12">
+            <div class="grid_3">
+                <a id="inspector_suspend_button" data-role="button">Suspend</a>
+            </div>     
+        </div>
+
+    </script>
+
+    <script type="text/x-jquery-tmpl" id="inspector_suspended_template">
+
+        <div class="container_12">
+
+            <div class="container_12 grid_4" style="padding-right: 5px;">
+                <div class="grid_4">
+                    <label for="inspector_status" style="margin-top: 8px;">Status:</label>
+                </div>     
+                <div class="grid_8">
+                    <input id="inspector_status" type="text" value="${inspector_status}" readonly  />
+                </div>     
+
+                <div class="grid_4">
+                    <label for="suspend_location" style="margin-top: 8px;">Location:</label>
+                </div>     
+                <div class="grid_8">
+                    <input id="suspend_location" type="text" value="${suspend_location}" readonly />
+                </div>     
+
+                <div class="grid_4">
+                    <label for="suspend_location" style="margin-top: 8px;">Draw Calls Last Frame:</label>
+                </div>     
+                <div class="grid_8">
+                    <input id="draw_calls_last_frame" type="text" value="${state_data.draw_calls_last_frame}" readonly />
+                </div>     
+
+                <div class="grid_12" style="">
+                    <p>Render State</p>
+                    <ul id='inspector_render_state' data-role="listview" data-inset="true" data-filter="true" >
+                    </ul>
+                </div>
+            </div>
+
+            <div class="container_12 grid_6" style="margin-left: 20px;">
+                <a id="inspector_resume_button" data-role="button" class="grid_7">Resume</a>
+                <a id="inspector_step_button" data-role="button" class="grid_7" >Step</a>
+                <input id="inspector_step_count" type="number" value="${suspend_count}" class="grid_6" style="margin-top: 5px; margin-bottom: 5px;" />
+                <a id="inspector_breakpoint_button" data-role="button" class="grid_7" >Invoke Breakpoint</a>
+
+                <div class="container_12 grid_12">
+                    <div class="grid_6" style="">
+                        <div class="textures">
+                            <p>Textures</p>
+                        </div>
+                        <div>
+                            <p>Render Target</p>
+                            <img id="inspector_rendertarget_screenshot" alt="None" />
+                        </div>
+                        <div>
+                            <p>Back Buffer</p>
+                            <img id="inspector_backbuffer_screenshot" alt="None" />
+                        </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </script>
+
+    <!-- Template for display of textures. -->
+    <script type="text/x-jquery-tmpl" id="texture_template">
+        <img class="texture" alt="None" src="${texture_url}" />
+    </script>
+
+    <!-- Template for a render state item. -->
+    <script type="text/x-jquery-tmpl" id="render_state_item_template">
+        <li>${name} <span class="ui-li-count">${value}</span></li>
+    </script>
+
+    <!-- Template for the config hierarchy. -->
+    <script type="text/x-jquery-tmpl" id="config_hierarchy_template">
+
+            {{if TemplateHelpers.is_array(value)}}
+                <tr id="node-${id}" 
+                    {{if parent_id > 0}}
+                        class="child-of-node-${parent_id}">
+                    {{/if}}
+                    >                
+                    <td>${name}</td>
+                </tr>
+
+                {{each(i, array_value) value}}
+                    {{if TemplateHelpers.is_string(array_value)}}
+                        ${array_value}
+                    {{else}}
+                        {{tmpl(array_value) '#config_hierarchy_template'}}
+                    {{/if}}
+                {{/each}}
+            {{else}}
+                <tr id="node-${id}" 
+                    {{if parent_id > 0}}
+                        class="child-of-node-${parent_id}">
+                    {{/if}}
+                    >                
+                    <td>${name}</td><td>${value}</td>
+                </tr>                
+            {{/if}}
+    </script>
+
+    <!-- Template for an item in a breakpoint list. -->
+    <script type="text/x-jquery-tmpl" id="breakpoint_list_item_template">
+        <li><a id="${name}" data-transition="none" class="breakpoint_button">${name}</a></li>
+    </script>
+
+</head> 
+
+<body id='body'> 
+
+    <div data-role="page" id='home'> 
+
+        <div data-role="content" >
+
+            <div class="page_content">
+                
+                <ul data-role="listview" data-inset="true">
+                    <li><a href="#config" data-transition="none">Config</a></li>
+                    <li><a href="#performance" data-transition="none">Performance</a></li>
+                    <li><a href="#debugger" data-transition="none">Debugger</a></li>
+                    <!--
+                    <li><a href="#inspector" data-transition="none">Inspector</a></li>
+                    <li><a href="#frame_analysis" data-transition="none">Frame Analysis</a></li>
+                    <li><a href="#resources" data-transition="none">Resources</a></li>
+                    <li><a href="#output" data-transition="none">Output</a></li>
+                    -->
+                    <li><a href="#about" data-transition="none">About</a></li>
+                </ul>
+            </div>
+
+        </div> 
+
+    </div> 
+
+    <div data-role="page" id='config'> 
+
+        <div data-role="content" >
+            <div class="page_content">
+
+                <!--todo: one day, a filter 
+                <div class="container_12" data-role="controlgroup" data-type="horizontal">
+                    <p class="grid_1" style="text-align: right; margin-top: 0.5em; margin-right: 1em;">Filter</p>
+                    <input id="config_filter" class="config_filter grid_6" style="margin-right: 1em;" type="text" />
+                    <a id="config_filter_button" class="grid_2" data-role="button">Filter</a>
+                    <a id="config_clear_filter_button" class="grid_2" data-role="button">Clear</a>
+                </div>
+                -->
+
+                <div id='config_list_container'>
+                    <table id='config_list' border="0" width="100%"></table>
+                </div>
+            </div>
+        </div> 
+
+    </div> 
+
+    <div data-role="page" id='performance'> 
+
+        <div data-role="content" >
+
+            <div class="page_content">
+                <ul id='pages_list' data-role="listview" data-inset="true">
+                </ul>        
+            </div>
+        </div> 
+
+    </div> 
+
+    <div data-role="page" id='debugger'> 
+
+        <div data-role="content" >
+
+            <div class="page_content">
+                <p>Click on a button below to invoke a breakpoint in the debugger.</p>
+
+                <p><b>WARNING:</b> You must be running the application under a debugger for a breakpoint to be invoked!  
+                    If you try this without the debugger, the application will crash.
+                </p>
+                <br>
+
+                <ul class='breakpoints_list' data-role="listview" data-inset="true" data-filter="true">
+                </ul>        
+            </div> 
+        </div>
+
+    </div> 
+
+    <div data-role="page" id='inspector'> 
+
+        <div data-role="content" >
+            <div class="page_content">
+            </div>
+        </div> 
+
+    </div> 
+
+    <div data-role="page" id='frame_analysis'> 
+
+        <div data-role="content" >
+            <div class="page_content">
+                frame_analysis
+            </div>
+        </div> 
+
+    </div> 
+
+    <div data-role="page" id='resources'> 
+
+        <div data-role="content" >
+            <div class="page_content">
+                resources
+            </div>
+        </div> 
+
+    </div> 
+
+    <div data-role="page" id='output'> 
+
+        <div data-role="content" >
+            <div class="page_content">
+            </div>
+        </div> 
+
+    </div> 
+
+    <div data-role="page" id='about'> 
+
+        <div data-role="content">
+            <h1>
+            Investigo - DirectX 9 Performance and Debugging Toolkit
+            </h1>
+            <p>
+                Investigo is a toolkit for DirectX9 performance analysis and debugging.
+
+                For any DirectX9 application: view live performance graphs via the embedded HTTP server and capture performance metrics for offline analysis.
+
+                Investigo is released under an MIT style licence.
+            </p>
+            <p>
+                Investigo is hosted by SourceForge:  <a href="https://sourceforge.net/projects/investigo/">
+                https://sourceforge.net/projects/investigo/
+                </a>
+
+            </p>
+            <p>
+
+                To clone the <a href="http://mercurial.selenic.com/">Mercurial</a> repository:
+
+                <pre>
+                hg clone http://hg.code.sf.net/p/investigo/src investigo-src
+                </pre>
+
+            <p>
+            <p>
+                Read the <a href="todo">Code Project article</a> for usage and implementation.
+            </p>
+            <p>
+                If you want to work on Investigo and help move it forward, please join me on SourceForge!
+            </p>
+            <p>
+                Code and article developed by <a href="http://www.codeproject.com/Members/ashley_davis">Ashley Davis</a>.
+            </p>
+        </div>
+    </div> 
+
+</body>
+</html>
