@@ -352,6 +352,15 @@ void InvestigoSingleton::RenderHUD(IDirect3DDevice9* device)
 	device->EndScene();
 }
 
+void InvestigoSingleton::ResetHUD() {
+	if (hudDeviceInitialized != NULL) {
+		pFont->Release();
+		pLargeFont->Release();
+		pSprite->Release();
+	}
+	hudDeviceInitialized = NULL;
+}
+
 //
 // The D3D device notifies that a frame has ended.
 //

@@ -214,6 +214,8 @@ public:
     //
 	void RenderHUD(IDirect3DDevice9* device);
 
+	void ResetHUD();
+
     //
     // The D3D device notifies that a frame has ended.
     //

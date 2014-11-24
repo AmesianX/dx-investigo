@@ -1,6 +1,24 @@
 #include "ProxyD3DX.h"
 #include "ProxyID3DXFont.h"
 
+
+#include <fstream>
+
+void logfont(const char* x) {
+	FILE * pFile = NULL;
+	fopen_s(&pFile, "d3dxfont.log", "a");
+	fputs(x, pFile);
+	fputs("\n", pFile);
+	fclose(pFile);
+}
+void logfont(const char* src, const int len) {
+	char* buffer = new char[len + 1];
+	memcpy(buffer, src, len);
+	buffer[len] = 0;
+	logfont(buffer);
+	delete buffer;
+}
+
 HRESULT __stdcall ProxyID3DXFont::QueryInterface(REFIID iid, LPVOID *ppv)
 {
 	return original->QueryInterface(iid, ppv);
@@ -50,9 +68,13 @@ HRESULT __stdcall ProxyID3DXFont::PreloadTextW(LPCWSTR pString, INT Count) {
 	return original->PreloadTextW(pString, Count);
 }
 INT __stdcall ProxyID3DXFont::DrawTextA(LPD3DXSPRITE pSprite, LPCSTR pString, INT Count, LPRECT pRect, DWORD Format, D3DCOLOR Color) {
+	logfont("DrawTextA called");
+	logfont(pString, Count);
 	return original->DrawTextA(pSprite, pString, Count, pRect, Format, Color);
 }
 INT __stdcall ProxyID3DXFont::DrawTextW(LPD3DXSPRITE pSprite, LPCWSTR pString, INT Count, LPRECT pRect, DWORD Format, D3DCOLOR Color) {
+	logfont("DrawTextW called");
+	//log(pString, Count);
 	return original->DrawTextW(pSprite, pString, Count, pRect, Format, Color);
 }
 

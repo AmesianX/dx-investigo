@@ -973,28 +973,29 @@ extern "C" __declspec(naked) void __stdcall __E__63__()
 		}
 	}
 
-//// D3DXCreateFontA
-//extern "C" __declspec(naked) void __stdcall __E__64__()
-//	{
-//	__asm
-//		{
-//		jmp p[64*4];
-//		}
-//	}
+// D3DXCreateFontA
+extern "C" __declspec(naked) void __stdcall __E__64__()
+	{
+	log("D3DXCreateFontA called (uninstrumented)");
+	__asm
+		{
+		jmp p[64*4];
+		}
+	}
 
 // D3DXCreateFontA
-HRESULT __stdcall __E__64__(
-	LPDIRECT3DDEVICE9 pDevice, INT Height, UINT Width, UINT Weight, UINT MipLevels, BOOL Italic, DWORD CharSet, DWORD OutputPrecision, DWORD Quality, DWORD PitchAndFamily, LPCSTR pFaceName, LPD3DXFONT* ppFont)
-{
-	log("D3DXCreateFontA called");
-
-	typedef HRESULT(WINAPI* D3DXCreateFontA)(LPDIRECT3DDEVICE9, INT, UINT, UINT, UINT, BOOL, DWORD, DWORD, DWORD, DWORD, LPCSTR, LPD3DXFONT*);
-	LPD3DXFONT pOriginal = NULL;
-	HRESULT result = ((D3DXCreateFontA)p[64])(pDevice, Height, Width, Weight, MipLevels, Italic, CharSet, OutputPrecision, Quality, PitchAndFamily, pFaceName, &pOriginal);
-	ProxyID3DXFont* pProxy = new ProxyID3DXFont(pOriginal);
-	*ppFont = pProxy;
-	return result;
-}
+//HRESULT __stdcall __E__64__(
+//	LPDIRECT3DDEVICE9 pDevice, INT Height, UINT Width, UINT Weight, UINT MipLevels, BOOL Italic, DWORD CharSet, DWORD OutputPrecision, DWORD Quality, DWORD PitchAndFamily, LPCSTR pFaceName, LPD3DXFONT* ppFont)
+//{
+//	log("D3DXCreateFontA called");
+//
+//	typedef HRESULT(WINAPI* D3DXCreateFontA)(LPDIRECT3DDEVICE9, INT, UINT, UINT, UINT, BOOL, DWORD, DWORD, DWORD, DWORD, LPCSTR, LPD3DXFONT*);
+//	LPD3DXFONT pOriginal = NULL;
+//	HRESULT result = ((D3DXCreateFontA)p[64])(pDevice, Height, Width, Weight, MipLevels, Italic, CharSet, OutputPrecision, Quality, PitchAndFamily, pFaceName, &pOriginal);
+//	ProxyID3DXFont* pProxy = new ProxyID3DXFont(pOriginal);
+//	*ppFont = pProxy;
+//	return result;
+//}
 
 
 // D3DXCreateFontIndirectA
@@ -1018,38 +1019,39 @@ extern "C" __declspec(naked) void __stdcall __E__66__()
 	}
 
 // D3DXCreateFontW
-//extern "C" __declspec(naked) void __stdcall __E__67__()
-//	{
-//	__asm
-//		{
-//		jmp p[67*4];
-//		}
-//	}
+extern "C" __declspec(naked) void __stdcall __E__67__()
+	{
+	log("D3DXCreateFontW called (uninstrumented)");
+	__asm
+		{
+		jmp p[67*4];
+		}
+	}
 
-// D3DXCreateFontA
-HRESULT __stdcall __E__67__(
-	LPDIRECT3DDEVICE9       pDevice,
-	INT                     Height,
-	UINT                    Width,
-	UINT                    Weight,
-	UINT                    MipLevels,
-	BOOL                    Italic,
-	DWORD                   CharSet,
-	DWORD                   OutputPrecision,
-	DWORD                   Quality,
-	DWORD                   PitchAndFamily,
-	LPCWSTR                 pFaceName,
-	LPD3DXFONT*             ppFont)
-{
-	log("D3DXCreateFontA called");
-
-	typedef HRESULT(WINAPI* D3DXCreateFontW)(LPDIRECT3DDEVICE9, INT, UINT, UINT, UINT, BOOL, DWORD, DWORD, DWORD, DWORD, LPCWSTR, LPD3DXFONT*);
-	LPD3DXFONT pOriginal = NULL;
-	HRESULT result = ((D3DXCreateFontW)p[67])(pDevice, Height, Width, Weight, MipLevels, Italic, CharSet, OutputPrecision, Quality, PitchAndFamily, pFaceName, &pOriginal);
-	ProxyID3DXFont* pProxy = new ProxyID3DXFont(pOriginal);
-	*ppFont = pProxy;
-	return result;
-}
+// D3DXCreateFontW
+//HRESULT __stdcall __E__67__(
+//	LPDIRECT3DDEVICE9       pDevice,
+//	INT                     Height,
+//	UINT                    Width,
+//	UINT                    Weight,
+//	UINT                    MipLevels,
+//	BOOL                    Italic,
+//	DWORD                   CharSet,
+//	DWORD                   OutputPrecision,
+//	DWORD                   Quality,
+//	DWORD                   PitchAndFamily,
+//	LPCWSTR                 pFaceName,
+//	LPD3DXFONT*             ppFont)
+//{
+//	log("D3DXCreateFontW called");
+//
+//	typedef HRESULT(WINAPI* D3DXCreateFontW)(LPDIRECT3DDEVICE9, INT, UINT, UINT, UINT, BOOL, DWORD, DWORD, DWORD, DWORD, LPCWSTR, LPD3DXFONT*);
+//	LPD3DXFONT pOriginal = NULL;
+//	HRESULT result = ((D3DXCreateFontW)p[67])(pDevice, Height, Width, Weight, MipLevels, Italic, CharSet, OutputPrecision, Quality, PitchAndFamily, pFaceName, &pOriginal);
+//	ProxyID3DXFont* pProxy = new ProxyID3DXFont(pOriginal);
+//	*ppFont = pProxy;
+//	return result;
+//}
 
 // D3DXCreateKeyframedAnimationSet
 extern "C" __declspec(naked) void __stdcall __E__68__()

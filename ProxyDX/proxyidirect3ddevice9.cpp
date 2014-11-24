@@ -165,6 +165,8 @@ HRESULT ProxyIDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
 {
 	//todo: need to release and restore all cached proxies.
 	//todo: record updated presentation parameters.
+
+	InvestigoSingleton::Instance()->ResetHUD();
     return original->Reset(pPresentationParameters);
 }
 
@@ -172,30 +174,36 @@ STDMETHODIMP ProxyIDirect3DDevice9::Present(THIS_ CONST RECT* pSourceRect,CONST 
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, Present)
 
-	//InvestigoSingleton::Instance()->RenderHUD(original);
+	InvestigoSingleton::Instance()->RenderHUD(original);
 
-	//{
-	//	boost::unique_lock<boost::mutex> lock(screenshotMutex);
+	{
+		boost::unique_lock<boost::mutex> lock(screenshotMutex);
 
-	//	LPDIRECT3DSURFACE9 backBuf;
-	//	if (!FAILED(original->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuf)))
-	//	{
-	//		LPD3DXBUFFER buffer = NULL;
-	//		if (!FAILED(D3DXSaveSurfaceToFileInMemory(&buffer, D3DXIFF_JPG, backBuf, NULL, NULL)))
-	//		{
-	//			int size = buffer->GetBufferSize();
-	//			screenshotData.resize(size);
-	//			memcpy(&screenshotData[0], buffer->GetBufferPointer(), size);
+		LPDIRECT3DSURFACE9 backBuf;
+		if (!FAILED(original->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuf)))
+		{
+			LPD3DXBUFFER buffer = NULL;
+			RECT rc;
+			SetRect(&rc, 14, 806, 464, 1038);
+			//SetRect(&rc, 14, 6, 464, 238);
+			if (!FAILED(D3DXSaveSurfaceToFileInMemory(&buffer, D3DXIFF_PNG, backBuf, NULL, &rc)))
+			{
+				int size = buffer->GetBufferSize();
+				screenshotData.resize(size);
+				memcpy(&screenshotData[0], buffer->GetBufferPointer(), size);
 
-	//			buffer->Release();
-	//		}
-	//		backBuf->Release();
-	//	}
-	//}
+				buffer->Release();
+			}
+			else {
+
+			}
+			backBuf->Release();
+		}
+	}
 
 	HRESULT hres = original->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 
-	//InvestigoSingleton::Instance()->NotifyFrameEnd();
+	InvestigoSingleton::Instance()->NotifyFrameEnd();
 	return hres;
 
 	//drawCallsLastFrame = drawCallsThisFrame;
@@ -858,8 +866,13 @@ void ProxyIDirect3DDevice9::GetBackbufferScreenshot(std::vector<unsigned char>& 
 	pSurface->Release();
 	*/
 	boost::unique_lock<boost::mutex> lock(screenshotMutex);
-	data.resize(screenshotData.size());
-	memcpy(&data[0], &screenshotData[0], screenshotData.size());
+	if (screenshotData.size() == 0) {
+		data.resize(0);
+		return;
+	} else {
+		data.resize(screenshotData.size());
+		memcpy(&data[0], &screenshotData[0], screenshotData.size());
+	}
 
 }
 
