@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="ProxyD3DX.cpp" />
     <ClCompile Include="ProxyID3DXEffect.cpp" />
+    <ClCompile Include="ProxyID3DXFont.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ProxyD3DX.def" />
@@ -20,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="ProxyD3DX.h" />
     <ClInclude Include="ProxyID3DXEffect.h" />
+    <ClInclude Include="ProxyID3DXFont.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D552554B-EB27-4A33-AA66-6266BD710105}</ProjectGuid>

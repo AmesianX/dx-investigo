@@ -28,22 +28,7 @@ ProxyIDirect3DVertexBuffer9::~ProxyIDirect3DVertexBuffer9()
 /*** IUnknown methods ***/
 HRESULT __stdcall ProxyIDirect3DVertexBuffer9::QueryInterface(REFIID riid, void** ppvObj)
 {
-	*ppvObj = NULL;
-
-    if (riid == __uuidof(Investigo::IResource))
-    {
-        AddRef();
-        *ppvObj = static_cast<Investigo::IResource*>(this);
-        return S_OK;
-    }
-
-	HRESULT result = original->QueryInterface(riid, ppvObj);
-	if (result == S_OK)
-	{
-		*ppvObj = this;
-	}
-
-	return result;
+	return original->QueryInterface(riid, ppvObj);
 }
 
 ULONG __stdcall ProxyIDirect3DVertexBuffer9::AddRef()
@@ -65,9 +50,7 @@ ULONG __stdcall ProxyIDirect3DVertexBuffer9::Release()
 /*** IDirect3DResource9 methods ***/
 HRESULT __stdcall ProxyIDirect3DVertexBuffer9::GetDevice(IDirect3DDevice9** ppDevice)
 {
-	proxyDevice->AddRef();
-	*ppDevice = proxyDevice;
-	return S_OK;
+	return original->GetDevice(ppDevice);
 }
 
 HRESULT __stdcall ProxyIDirect3DVertexBuffer9::SetPrivateData(REFGUID refguid,CONST void* pData,DWORD SizeOfData,DWORD Flags)

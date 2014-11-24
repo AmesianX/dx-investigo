@@ -3,6 +3,7 @@
   <ItemGroup>
     <ClCompile Include="ProxyD3DX.cpp" />
     <ClCompile Include="ProxyID3DXEffect.cpp" />
+    <ClCompile Include="ProxyID3DXFont.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ProxyD3DX.def" />
@@ -10,5 +11,6 @@
   <ItemGroup>
     <ClInclude Include="ProxyID3DXEffect.h" />
     <ClInclude Include="ProxyD3DX.h" />
+    <ClInclude Include="ProxyID3DXFont.h" />
   </ItemGroup>
 </Project>

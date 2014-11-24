@@ -18,22 +18,7 @@
 /*** IUnknown methods ***/
 HRESULT __stdcall ProxyIDirect3DSwapChain9::QueryInterface(REFIID riid, void** ppvObj)
 {
-	*ppvObj = NULL;
-
-    if (riid == __uuidof(Investigo::IResource))
-    {
-        AddRef();
-        *ppvObj = static_cast<Investigo::IResource*>(this);
-        return S_OK;
-    }
-
-	HRESULT result = original->QueryInterface(riid, ppvObj);
-	if (result == S_OK)
-	{
-		*ppvObj = this;
-	}
-
-	return result;
+	return original->QueryInterface(riid, ppvObj);
 }
 
 ULONG __stdcall ProxyIDirect3DSwapChain9::AddRef()
@@ -67,10 +52,7 @@ HRESULT __stdcall ProxyIDirect3DSwapChain9::GetFrontBufferData(IDirect3DSurface9
 
 HRESULT __stdcall ProxyIDirect3DSwapChain9::GetBackBuffer(UINT iBackBuffer,D3DBACKBUFFER_TYPE Type,IDirect3DSurface9** ppBackBuffer)
 {
-	IDirect3DSurface9* originalSurface = NULL;
-	HRESULT result = original->GetBackBuffer(iBackBuffer,Type,&originalSurface);
-	*ppBackBuffer = new ProxyIDirect3DSurface9(originalSurface, proxyDevice, (boost::format("%s_%d") % GetName() % iBackBuffer).str());
-	return result;
+	return original->GetBackBuffer(iBackBuffer, Type, ppBackBuffer);
 }
 
 HRESULT __stdcall ProxyIDirect3DSwapChain9::GetRasterStatus(D3DRASTER_STATUS* pRasterStatus)
@@ -85,9 +67,7 @@ HRESULT __stdcall ProxyIDirect3DSwapChain9::GetDisplayMode(D3DDISPLAYMODE* pMode
 
 HRESULT __stdcall ProxyIDirect3DSwapChain9::GetDevice(IDirect3DDevice9** ppDevice)
 {
-	proxyDevice->AddRef();
-	*ppDevice = proxyDevice;
-	return S_OK;
+	return original->GetDevice(ppDevice);
 }
 
 HRESULT __stdcall ProxyIDirect3DSwapChain9::GetPresentParameters(D3DPRESENT_PARAMETERS* pPresentationParameters)

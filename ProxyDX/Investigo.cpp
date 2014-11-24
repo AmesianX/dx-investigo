@@ -101,7 +101,7 @@ InvestigoSingleton::InvestigoSingleton() :
 	frameStartTime(0),
 	prevFrameFPS(0),
 	prevFrameTime(0),
-	hudInitialized(false),
+	hudDeviceInitialized(NULL),
     pSprite(NULL),
     pFont(NULL),
     pLargeFont(NULL),
@@ -289,58 +289,63 @@ void InvestigoSingleton::ExitWhenPerformanceLoggingFinished()
 //
 void InvestigoSingleton::RenderHUD(IDirect3DDevice9* device)
 {
-	if (!hudInitialized)
+	if (hudDeviceInitialized != device)
 	{
-		hudInitialized = true;
+		hudDeviceInitialized = device;
 
 		D3DXCreateFont(device, 15, 0, FW_BOLD, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Arial", &pFont);
-        D3DXCreateFont(device, 20, 0, FW_BOLD, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Arial", &pLargeFont);
+		D3DXCreateFont(device, 20, 0, FW_BOLD, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Arial", &pLargeFont);
 		D3DXCreateSprite(device, &pSprite);
 	}
 
 	device->BeginScene();
 
-	D3DRECT rec = {4,4,215,55};
-	device->Clear(1, &rec, D3DCLEAR_TARGET, D3DCOLOR_ARGB(255,255,255,255),0 ,0); //todo: make the rect cover the entire area.
+	//D3DRECT rec = {4,4,70,40};
+	//device->Clear(1, &rec, D3DCLEAR_TARGET, D3DCOLOR_ARGB(255,255,255,255),0 ,0); //todo: make the rect cover the entire area.
 
 	pSprite->Begin(D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE);
 
-    RECT rc;
+	RECT rc;
 
-    if (IsPerformanceLoggingEnabled())
-    {
-        RECT rc;
-        SetRect(&rc, 10, 5, 0, 0);
-        pFont->DrawTextA(pSprite, "Investigo - Logging", -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
-    }
-    else
-    {
-        SetRect(&rc, 10, 5, 0, 0);
-        pFont->DrawTextA(pSprite, "Investigo", -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
-    }
+	//if (IsPerformanceLoggingEnabled())
+	//{
+	//    RECT rc;
+	//    SetRect(&rc, 10, 5, 0, 0);
+	//    pFont->DrawTextA(pSprite, "Investigo - Logging", -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
+	//}
+	//else
+	//{
+	//    SetRect(&rc, 10, 5, 0, 0);
+	//    pFont->DrawTextA(pSprite, "Investigo", -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
+	//}
 
-    char buf[1024];
+	char buf[1024];
 
-    SetRect(&rc, 10, 23, 0, 0);
-    sprintf(buf, "%3.2f", prevFrameFPS);
-    pLargeFont->DrawTextA(pSprite, buf, -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
+	SetRect(&rc, 0, 0, 0, 0);
+	if (prevFrameFPS > 10.0) {
+		sprintf(buf, "%3.0f", prevFrameFPS);
+	} else {
+		sprintf(buf, "%3.1f", prevFrameFPS);
+	}
 
-    SetRect(&rc, 100, 23, 0, 0);
-    sprintf(buf, "%3.1f", prevFrameTime);
-    pLargeFont->DrawTextA(pSprite, buf, -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
+	pLargeFont->DrawTextA(pSprite, buf, -1, &rc, DT_NOCLIP, D3DXCOLOR(1, 1, 0, 1));
 
-    SetRect(&rc, 170, 23, 0, 0);
-    sprintf(buf, "%d", frameNumber);
-    pLargeFont->DrawTextA(pSprite, buf, -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
+	//SetRect(&rc, 100, 23, 0, 0);
+	//sprintf(buf, "%3.1f", prevFrameTime);
+	//pLargeFont->DrawTextA(pSprite, buf, -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
 
-    SetRect(&rc, 13, 38, 0, 0);
-    pFont->DrawTextA(pSprite, "fps", -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
+	//SetRect(&rc, 170, 23, 0, 0);
+	//sprintf(buf, "%d", frameNumber);
+	//pLargeFont->DrawTextA(pSprite, buf, -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
 
-    SetRect(&rc, 103, 38, 0, 0);
-    pFont->DrawTextA(pSprite, "time", -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
+	//SetRect(&rc, 13, 23, 0, 0);
+	//pFont->DrawTextA(pSprite, "fps", -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
 
-    SetRect(&rc, 173, 38, 0, 0);
-    pFont->DrawTextA(pSprite, "frame", -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
+	//SetRect(&rc, 103, 38, 0, 0);
+	//pFont->DrawTextA(pSprite, "time", -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
+
+	//SetRect(&rc, 173, 38, 0, 0);
+	//pFont->DrawTextA(pSprite, "frame", -1, &rc, DT_NOCLIP, D3DXCOLOR(0, 0, 0, 1));
 
 	pSprite->End();
 

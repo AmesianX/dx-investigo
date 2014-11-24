@@ -25,9 +25,9 @@ using std::stringstream;
 
 #define assert(x) if (!(x))  { char buf[1024]; sprintf(buf, "Assert failed: %s\n", #x); OutputDebugStringA(buf); }
 
-const int MAX_RENDER_TARGETS = 20;
-const int MAX_TEXTURES = 20;
-const int MAX_STREAMS = 20;
+const int MAX_RENDER_TARGETS = 200;
+const int MAX_TEXTURES = 2000;
+const int MAX_STREAMS = 2000;
 
 ProxyIDirect3DDevice9::ProxyIDirect3DDevice9(IDirect3DDevice9* _original, UINT _adapter, D3DDEVTYPE _deviceType, HWND _focusWindow, DWORD _behaviorFlags, D3DPRESENT_PARAMETERS* _presentationParameters) :
 	original(_original),
@@ -71,50 +71,29 @@ ProxyIDirect3DDevice9::~ProxyIDirect3DDevice9()
 
 HRESULT ProxyIDirect3DDevice9::QueryInterface (REFIID riid, void** ppvObj)
 {
-	*ppvObj = NULL;
-
-	HRESULT result = original->QueryInterface(riid, ppvObj);
-	if (result == S_OK)
-	{
-		ULONG count = original->AddRef()-1;
-		original->Release();
-
-		//char buf[1024];
-		//sprintf(buf, "ProxyIDirect3DDevice9::QueryInterface[0x%X]: %d\n", this, count);
-		//OutputDebugStringA(buf);
-
-		*ppvObj = this;
-	}
-
-	return result;
+	return original->QueryInterface(riid, ppvObj);
 }
 
 ULONG ProxyIDirect3DDevice9::AddRef()
 {
-    ULONG count = original->AddRef();
-	//fio:
-	//char buf[1024];
-	//sprintf(buf, "ProxyIDirect3DDevice9::AddRef[0x%X]: %d\n", this, count);
-	//OutputDebugStringA(buf);
-
-	return count;
+    return original->AddRef();
 }
 
 ULONG ProxyIDirect3DDevice9::Release()
 {
-	ULONG count = original->Release();
+	return original->Release();
 
-	//fio:
-	//char buf[1024];
-	//sprintf(buf, "ProxyIDirect3DDevice9::Release[0x%X]: %d\n", this, count);
-	//OutputDebugStringA(buf);
+	////fio:
+	////char buf[1024];
+	////sprintf(buf, "ProxyIDirect3DDevice9::Release[0x%X]: %d\n", this, count);
+	////OutputDebugStringA(buf);
 
-	if (count == 0)
-	{		
-		delete(this);
-	}
+	//if (count == 0)
+	//{		
+	//	delete(this);
+	//}
 
-	return count;
+	//return count;
 }
 
 HRESULT ProxyIDirect3DDevice9::TestCooperativeLevel()
@@ -154,8 +133,7 @@ HRESULT ProxyIDirect3DDevice9::GetCreationParameters(D3DDEVICE_CREATION_PARAMETE
 
 HRESULT ProxyIDirect3DDevice9::SetCursorProperties(UINT XHotSpot,UINT YHotSpot,IDirect3DSurface9* pCursorBitmap)
 {
-	ProxyIDirect3DSurface9* proxySurface = dynamic_cast<ProxyIDirect3DSurface9*>(pCursorBitmap); 
-	return original->SetCursorProperties(XHotSpot,YHotSpot,proxySurface->GetOriginal());
+	return original->SetCursorProperties(XHotSpot, YHotSpot, pCursorBitmap);
 }
 
 void ProxyIDirect3DDevice9::SetCursorPosition(int X,int Y,DWORD Flags)
@@ -170,37 +148,12 @@ BOOL ProxyIDirect3DDevice9::ShowCursor(BOOL bShow)
 
 HRESULT ProxyIDirect3DDevice9::CreateAdditionalSwapChain(D3DPRESENT_PARAMETERS* pPresentationParameters,IDirect3DSwapChain9** pSwapChain)  
 {
-	IDirect3DSwapChain9* originalSwapChain = NULL;
-	HRESULT result = original->CreateAdditionalSwapChain(pPresentationParameters,&originalSwapChain);
-	if (!FAILED(result) && originalSwapChain != NULL)
-	{
-		if (pSwapChain != NULL)
-		{
-			*pSwapChain = new ProxyIDirect3DSwapChain9(originalSwapChain, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-		}
-	}
-	else if (pSwapChain != NULL)
-	{
-		*pSwapChain = NULL;
-	}
-	
-	return result;
+	return original->CreateAdditionalSwapChain(pPresentationParameters, pSwapChain);
 }
 
 HRESULT ProxyIDirect3DDevice9::GetSwapChain(UINT iSwapChain,IDirect3DSwapChain9** pSwapChain)
 {
-	IDirect3DSwapChain9* originalSwapChain = NULL;
-	HRESULT result = original->GetSwapChain(iSwapChain,&originalSwapChain);
-	if (!FAILED(result) && originalSwapChain != NULL)
-	{
-		*pSwapChain = new ProxyIDirect3DSwapChain9(originalSwapChain, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-	}
-	else
-	{
-		*pSwapChain = NULL;
-	}
-	
-	return result;    
+	return original->GetSwapChain(iSwapChain, pSwapChain);
 }
 
 UINT ProxyIDirect3DDevice9::GetNumberOfSwapChains()
@@ -218,53 +171,46 @@ HRESULT ProxyIDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
 STDMETHODIMP ProxyIDirect3DDevice9::Present(THIS_ CONST RECT* pSourceRect,CONST RECT* pDestRect,HWND hDestWindowOverride,CONST RGNDATA* pDirtyRegion)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, Present)
-	
 
-	InvestigoSingleton::Instance()->RenderHUD(original);
+	//InvestigoSingleton::Instance()->RenderHUD(original);
+
+	//{
+	//	boost::unique_lock<boost::mutex> lock(screenshotMutex);
+
+	//	LPDIRECT3DSURFACE9 backBuf;
+	//	if (!FAILED(original->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuf)))
+	//	{
+	//		LPD3DXBUFFER buffer = NULL;
+	//		if (!FAILED(D3DXSaveSurfaceToFileInMemory(&buffer, D3DXIFF_JPG, backBuf, NULL, NULL)))
+	//		{
+	//			int size = buffer->GetBufferSize();
+	//			screenshotData.resize(size);
+	//			memcpy(&screenshotData[0], buffer->GetBufferPointer(), size);
+
+	//			buffer->Release();
+	//		}
+	//		backBuf->Release();
+	//	}
+	//}
 
 	HRESULT hres = original->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 
-	InvestigoSingleton::Instance()->NotifyFrameEnd();
-
-	drawCallsLastFrame = drawCallsThisFrame;
-	drawCallsThisFrame = 0;
-
-	DX_INSPECTOR_SUSPEND_POINT(IDirect3DDevice9, Present)
-
+	//InvestigoSingleton::Instance()->NotifyFrameEnd();
 	return hres;
+
+	//drawCallsLastFrame = drawCallsThisFrame;
+	//drawCallsThisFrame = 0;
+
+	//DX_INSPECTOR_SUSPEND_POINT(IDirect3DDevice9, Present)
+
+	//return hres;
 }
 
 HRESULT ProxyIDirect3DDevice9::GetBackBuffer(UINT iSwapChain,UINT iBackBuffer,D3DBACKBUFFER_TYPE Type,IDirect3DSurface9** ppBackBuffer)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, GetBackBuffer);
 
-	if (backBuffer != NULL)
-	{
-		if (ppBackBuffer != NULL)
-		{
-			backBuffer->AddRef();
-			*ppBackBuffer = backBuffer;
-		}
-
-		return S_OK;
-	}
- 
-	IDirect3DSurface9* originalSurface = NULL;
-	HRESULT result = original->GetBackBuffer(iSwapChain,iBackBuffer,Type,&originalSurface);
-	if (!FAILED(result) && originalSurface != NULL)
-	{
-		if (ppBackBuffer != NULL)
-		{
-			backBuffer = new ProxyIDirect3DSurface9(originalSurface, this, "BackBuffer");
-			*ppBackBuffer = backBuffer;
-		}
-	}
-	else if (ppBackBuffer != NULL)
-	{
-		*ppBackBuffer = NULL;
-	}
-
-	return result;
+	return original->GetBackBuffer(iSwapChain, iBackBuffer, Type, ppBackBuffer);
 }
 
 HRESULT ProxyIDirect3DDevice9::GetRasterStatus(UINT iSwapChain,D3DRASTER_STATUS* pRasterStatus)
@@ -291,330 +237,113 @@ HRESULT ProxyIDirect3DDevice9::CreateTexture(UINT Width,UINT Height,UINT Levels,
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, CreateTexture);
 
-	IDirect3DTexture9* originalTexture = NULL;
-	HRESULT result = original->CreateTexture(Width,Height,Levels,Usage,Format,Pool,&originalTexture,pSharedHandle);
-	if (!FAILED(result) && originalTexture != NULL)
-	{
-		if (ppTexture != NULL)
-		{
-			*ppTexture = new ProxyIDirect3DTexture9(originalTexture, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-		}
-	}
-	else if (ppTexture != NULL)
-	{
-		*ppTexture =  NULL;
-	}
-
-	return result;
+	return original->CreateTexture(Width, Height, Levels, Usage, Format, Pool, ppTexture, pSharedHandle);
 }
 
 HRESULT ProxyIDirect3DDevice9::CreateVolumeTexture(UINT Width,UINT Height,UINT Depth,UINT Levels,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DVolumeTexture9** ppVolumeTexture,HANDLE* pSharedHandle)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, CreateVolumeTexture);
 
-	IDirect3DVolumeTexture9* originalTexture = NULL;
-	HRESULT result = original->CreateVolumeTexture(Width,Height,Depth,Levels,Usage,Format,Pool,&originalTexture,pSharedHandle);
-	if (!FAILED(result) && originalTexture != NULL)
-	{
-		if (ppVolumeTexture != NULL)
-		{
-			*ppVolumeTexture = new ProxyIDirect3DVolumeTexture9(originalTexture, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-		}
-	}
-	else if (ppVolumeTexture != NULL)
-	{
-		*ppVolumeTexture = NULL;
-	}
-
-	return result;
+	return original->CreateVolumeTexture(Width, Height, Depth, Levels, Usage, Format, Pool, ppVolumeTexture, pSharedHandle);
 }
 
 HRESULT ProxyIDirect3DDevice9::CreateCubeTexture(UINT EdgeLength,UINT Levels,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DCubeTexture9** ppCubeTexture,HANDLE* pSharedHandle)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, CreateCubeTexture);
 
-	IDirect3DCubeTexture9* originalTexture = NULL;
-	HRESULT result = original->CreateCubeTexture(EdgeLength,Levels,Usage,Format,Pool,&originalTexture,pSharedHandle);
-	if (!FAILED(result) && originalTexture != NULL)
-	{
-		if (ppCubeTexture != NULL)
-		{
-			*ppCubeTexture = new ProxyIDirect3DCubeTexture9(originalTexture, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-		}
-	}
-	else if (ppCubeTexture != NULL)
-	{
-		*ppCubeTexture = NULL;
-	}
-
-	return result;
+	return original->CreateCubeTexture(EdgeLength, Levels, Usage, Format, Pool, ppCubeTexture, pSharedHandle);
 }
 
 HRESULT ProxyIDirect3DDevice9::CreateVertexBuffer(UINT Length,DWORD Usage,DWORD FVF,D3DPOOL Pool,IDirect3DVertexBuffer9** ppVertexBuffer,HANDLE* pSharedHandle)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, CreateVertexBuffer);
 
-	IDirect3DVertexBuffer9* originalVertexBuffer = NULL;
-    HRESULT result = original->CreateVertexBuffer(Length,Usage,FVF,Pool,&originalVertexBuffer,pSharedHandle);
-	if (!FAILED(result) && originalVertexBuffer != NULL)
-	{
-		if (ppVertexBuffer != NULL)
-		{
-            *ppVertexBuffer = new ProxyIDirect3DVertexBuffer9(originalVertexBuffer, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-		}
-	}
-	else if (ppVertexBuffer != NULL)
-	{
-		*ppVertexBuffer = NULL;
-	}
-	
-	return result;
+	return original->CreateVertexBuffer(Length, Usage, FVF, Pool, ppVertexBuffer, pSharedHandle);
 }
 
 HRESULT ProxyIDirect3DDevice9::CreateIndexBuffer(UINT Length,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DIndexBuffer9** ppIndexBuffer,HANDLE* pSharedHandle)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, CreateIndexBuffer);
 
-	IDirect3DIndexBuffer9* originalIndexBuffer = NULL;
-    HRESULT result = original->CreateIndexBuffer(Length,Usage,Format,Pool,&originalIndexBuffer,pSharedHandle);
-	if (!FAILED(result) && originalIndexBuffer != NULL)
-	{
-		if (ppIndexBuffer != NULL)
-		{
-            *ppIndexBuffer = new ProxyIDirect3DIndexBuffer9(originalIndexBuffer, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-		}
-	}
-	else if (ppIndexBuffer != NULL)
-	{
-		*ppIndexBuffer = NULL;
-	}
-	
-	return result;
+	return original->CreateIndexBuffer(Length, Usage, Format, Pool, ppIndexBuffer, pSharedHandle);
 }
 
 HRESULT ProxyIDirect3DDevice9::CreateRenderTarget(UINT Width,UINT Height,D3DFORMAT Format,D3DMULTISAMPLE_TYPE MultiSample,DWORD MultisampleQuality,BOOL Lockable,IDirect3DSurface9** ppSurface,HANDLE* pSharedHandle)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, CreateRenderTarget);
 
-	IDirect3DSurface9* originalRenderTarget = NULL;
-	HRESULT result = original->CreateRenderTarget(Width,Height,Format,MultiSample,MultisampleQuality,Lockable,&originalRenderTarget,pSharedHandle);
-	if (!FAILED(result) && originalRenderTarget != NULL)
-	{
-		if (ppSurface != NULL)
-		{
-			*ppSurface = new ProxyIDirect3DSurface9(originalRenderTarget, this, InvestigoSingleton::Instance()->FormatCurrentResourceName("RenderTarget"));
-		}
-	}
-	else if (ppSurface != NULL)
-	{
-		*ppSurface = NULL;
-	}
-
-	return result;
+	return original->CreateRenderTarget(Width, Height, Format, MultiSample, MultisampleQuality, Lockable, ppSurface, pSharedHandle);
 }
 
 HRESULT ProxyIDirect3DDevice9::CreateDepthStencilSurface(UINT Width,UINT Height,D3DFORMAT Format,D3DMULTISAMPLE_TYPE MultiSample,DWORD MultisampleQuality,BOOL Discard,IDirect3DSurface9** ppSurface,HANDLE* pSharedHandle)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, CreateDepthStencilSurface);
 
-	IDirect3DSurface9* originalSurface = NULL;
-	HRESULT result = original->CreateDepthStencilSurface(Width,Height,Format,MultiSample,MultisampleQuality,Discard,&originalSurface,pSharedHandle);
-	if (!FAILED(result) && originalSurface != NULL)
-	{
-		if (ppSurface != NULL)
-		{
-            *ppSurface = new ProxyIDirect3DSurface9(originalSurface, this, InvestigoSingleton::Instance()->FormatCurrentResourceName("DepthStencil"));
-		}
-	}
-	else if (ppSurface != NULL)
-	{
-		*ppSurface = NULL;
-	}
-	return result;
+	return original->CreateDepthStencilSurface(Width, Height, Format, MultiSample, MultisampleQuality, Discard, ppSurface, pSharedHandle);
 }
 
 HRESULT ProxyIDirect3DDevice9::UpdateSurface(IDirect3DSurface9* pSourceSurface,CONST RECT* pSourceRect,IDirect3DSurface9* pDestinationSurface,CONST POINT* pDestPoint)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, UpdateSurface);
 
-	ProxyIDirect3DSurface9* sourceProxy = dynamic_cast<ProxyIDirect3DSurface9*>(pSourceSurface); 
-	ProxyIDirect3DSurface9* destProxy = dynamic_cast<ProxyIDirect3DSurface9*>(pDestinationSurface); 
-	return original->UpdateSurface(sourceProxy->GetOriginal(),pSourceRect,destProxy->GetOriginal(),pDestPoint);
+	return original->UpdateSurface(pSourceSurface, pSourceRect, pDestinationSurface, pDestPoint);
 }
 
 HRESULT ProxyIDirect3DDevice9::UpdateTexture(IDirect3DBaseTexture9* pSourceTexture,IDirect3DBaseTexture9* pDestinationTexture)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, UpdateTexture);
 
-	ProxyIDirect3DBaseTexture9* proxySourceTexture = dynamic_cast<ProxyIDirect3DBaseTexture9*>(pSourceTexture);
-	ProxyIDirect3DBaseTexture9* proxyDestinationTexture = dynamic_cast<ProxyIDirect3DBaseTexture9*>(pDestinationTexture);
-	return original->UpdateTexture(proxySourceTexture->GetOriginal(),proxyDestinationTexture->GetOriginal());
+	return original->UpdateTexture(pSourceTexture, pDestinationTexture);
 }
 
 HRESULT ProxyIDirect3DDevice9::GetRenderTargetData(IDirect3DSurface9* pRenderTarget,IDirect3DSurface9* pDestSurface)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, GetRenderTargetData);
 
-	ProxyIDirect3DSurface9* proxyRenderTarget = dynamic_cast<ProxyIDirect3DSurface9*>(pRenderTarget); 
-	ProxyIDirect3DSurface9* proxyDest = dynamic_cast<ProxyIDirect3DSurface9*>(pDestSurface); 
-	return original->GetRenderTargetData(proxyRenderTarget->GetOriginal(),proxyDest->GetOriginal());
+	return original->GetRenderTargetData(pRenderTarget, pDestSurface);
 }
 
 HRESULT ProxyIDirect3DDevice9::GetFrontBufferData(UINT iSwapChain,IDirect3DSurface9* pDestSurface)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, GetFrontBufferData);
 
-	ProxyIDirect3DSurface9* proxySurface = dynamic_cast<ProxyIDirect3DSurface9*>(pDestSurface); 
-	return original->GetFrontBufferData(iSwapChain,proxySurface->GetOriginal());
+	return original->GetFrontBufferData(iSwapChain, pDestSurface);
 }
 
 HRESULT ProxyIDirect3DDevice9::StretchRect(IDirect3DSurface9* pSourceSurface,CONST RECT* pSourceRect,IDirect3DSurface9* pDestSurface,CONST RECT* pDestRect,D3DTEXTUREFILTERTYPE Filter)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, StretchRect);
-
-	ProxyIDirect3DSurface9* proxySourceSurface = dynamic_cast<ProxyIDirect3DSurface9*>(pSourceSurface); 
-	ProxyIDirect3DSurface9* proxyDestSurface = dynamic_cast<ProxyIDirect3DSurface9*>(pDestSurface); 
-	return original->StretchRect(proxySourceSurface->GetOriginal(),pSourceRect,proxyDestSurface->GetOriginal(),pDestRect,Filter);
+	return original->StretchRect(pSourceSurface, pSourceRect, pDestSurface, pDestRect, Filter);
 }
 
 HRESULT ProxyIDirect3DDevice9::ColorFill(IDirect3DSurface9* pSurface,CONST RECT* pRect,D3DCOLOR color)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, ColorFill);
-
-	ProxyIDirect3DSurface9* proxySurface = dynamic_cast<ProxyIDirect3DSurface9*>(pSurface); 
-	return original->ColorFill(proxySurface->GetOriginal(),pRect,color);
+	return original->ColorFill(pSurface, pRect, color);
 }
 
 HRESULT ProxyIDirect3DDevice9::CreateOffscreenPlainSurface(UINT Width,UINT Height,D3DFORMAT Format,D3DPOOL Pool,IDirect3DSurface9** ppSurface,HANDLE* pSharedHandle)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, CreateOffscreenPlainSurface);
-
-	IDirect3DSurface9* originalSurface = NULL;
-	HRESULT result = original->CreateOffscreenPlainSurface(Width,Height,Format,Pool,&originalSurface,pSharedHandle);
-	if (!FAILED(result) && originalSurface != NULL)
-	{
-		if (ppSurface != NULL)
-		{
-            *ppSurface = new ProxyIDirect3DSurface9(originalSurface, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-		}
-	}
-	else
-	{
-		if (ppSurface != NULL)
-		{
-			*ppSurface = NULL;
-		}
-	}
-
-	return result;
+	return original->CreateOffscreenPlainSurface(Width, Height, Format, Pool, ppSurface, pSharedHandle);
 }
 
 HRESULT ProxyIDirect3DDevice9::SetRenderTarget(DWORD RenderTargetIndex,IDirect3DSurface9* pRenderTarget)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, SetRenderTarget);
-	
-
-	ProxyIDirect3DSurface9* proxyRenderTarget = dynamic_cast<ProxyIDirect3DSurface9*>(pRenderTarget); 
-
-	if (pRenderTarget != renderTargets[RenderTargetIndex])
-	{
-		renderTargets[RenderTargetIndex] = proxyRenderTarget;
-	}
-
-	if (pRenderTarget == NULL)
-	{
-		return original->SetRenderTarget(RenderTargetIndex,NULL);
-	}
-	else
-	{
-		return original->SetRenderTarget(RenderTargetIndex,proxyRenderTarget->GetOriginal());
-	}
+	return original->SetRenderTarget(RenderTargetIndex, pRenderTarget);
 }
 
 
 HRESULT ProxyIDirect3DDevice9::GetRenderTarget(DWORD RenderTargetIndex,IDirect3DSurface9** ppRenderTarget)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, GetRenderTarget);
-
-	if (renderTargets[RenderTargetIndex] != NULL)
-	{
-		if (ppRenderTarget != NULL)
-		{
-			renderTargets[RenderTargetIndex]->AddRef();
-			*ppRenderTarget = renderTargets[RenderTargetIndex];
-		}
-		return S_OK;
-	}
-
-	IDirect3DSurface9* originalSurface = NULL;
-	HRESULT result = original->GetRenderTarget(RenderTargetIndex,&originalSurface);
-	if (!FAILED(result) && originalSurface != NULL)
-	{
-		if (ppRenderTarget != NULL)
-		{
-            renderTargets[RenderTargetIndex] = new ProxyIDirect3DSurface9(originalSurface, this, InvestigoSingleton::Instance()->FormatCurrentResourceName("RenderTarget"));
-			*ppRenderTarget = renderTargets[RenderTargetIndex];
-		}
-	}
-	else if (ppRenderTarget != NULL)
-	{
-		*ppRenderTarget = NULL;
-	}
-
-	return result;
+	return original->GetRenderTarget(RenderTargetIndex, ppRenderTarget);
 }
 
 HRESULT ProxyIDirect3DDevice9::SetDepthStencilSurface(IDirect3DSurface9* pNewZStencil)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, SetDepthStencilSurface);
-
-	ProxyIDirect3DSurface9* proxyNewZStencil = dynamic_cast<ProxyIDirect3DSurface9*>(pNewZStencil); 
-	if (pNewZStencil != depthStencilSurface)
-	{
-		depthStencilSurface = proxyNewZStencil;
-	}
-
-	if (proxyNewZStencil == NULL)
-	{
-		return original->SetDepthStencilSurface(NULL);
-	}
-	else
-	{
-		return original->SetDepthStencilSurface(proxyNewZStencil->GetOriginal());
-	}
+	return original->SetDepthStencilSurface(pNewZStencil);
 }
 
 HRESULT ProxyIDirect3DDevice9::GetDepthStencilSurface(IDirect3DSurface9** ppZStencilSurface)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, GetDepthStencilSurface);
-
-	if (depthStencilSurface != NULL)
-	{
-		if (ppZStencilSurface != NULL)
-		{
-			depthStencilSurface->AddRef();
-			*ppZStencilSurface = depthStencilSurface;
-		}
-
-		return S_OK;
-	}
-
-	IDirect3DSurface9* originalSurface = NULL;
-	HRESULT result = original->GetDepthStencilSurface(&originalSurface);
-	if (!FAILED(result) && originalSurface != NULL)
-	{
-		if (ppZStencilSurface != NULL)
-		{
-			depthStencilSurface = new ProxyIDirect3DSurface9(originalSurface, this, "DepthStencil");
-			*ppZStencilSurface = depthStencilSurface;
-		}
-	}
-	else if (ppZStencilSurface != NULL)
-	{
-		*ppZStencilSurface = NULL;
-	}
-
-	return result;
+	return original->GetDepthStencilSurface(ppZStencilSurface);
 }
 
 HRESULT ProxyIDirect3DDevice9::BeginScene()
@@ -733,22 +462,7 @@ HRESULT ProxyIDirect3DDevice9::GetRenderState(D3DRENDERSTATETYPE State,DWORD* pV
 HRESULT ProxyIDirect3DDevice9::CreateStateBlock(D3DSTATEBLOCKTYPE Type,IDirect3DStateBlock9** ppSB)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, CreateStateBlock);
-
-	IDirect3DStateBlock9* originalStateBlock = NULL;
-    HRESULT result = original->CreateStateBlock(Type,&originalStateBlock);
-	if (!FAILED(result) && originalStateBlock != NULL)
-	{
-		if (ppSB != NULL)
-		{
-			*ppSB = new ProxyIDirect3DStateBlock9(Type, originalStateBlock, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-		}
-	}
-	else if (ppSB != NULL)
-	{
-		*ppSB = NULL;
-	}
-	
-	return result;
+	return original->CreateStateBlock(Type, ppSB);
 }
 
 HRESULT ProxyIDirect3DDevice9::BeginStateBlock()
@@ -760,22 +474,7 @@ HRESULT ProxyIDirect3DDevice9::BeginStateBlock()
 HRESULT ProxyIDirect3DDevice9::EndStateBlock(IDirect3DStateBlock9** ppSB)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, EndStateBlock);
-
-	IDirect3DStateBlock9* originalStateBlock = NULL;
-    HRESULT result = original->EndStateBlock(&originalStateBlock);
-	if (!FAILED(result) && originalStateBlock != NULL)
-	{
-		if (ppSB != NULL)
-		{
-			*ppSB = new ProxyIDirect3DStateBlock9((D3DSTATEBLOCKTYPE)0, originalStateBlock, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-		}
-	}
-	else if (ppSB != NULL)
-	{
-		*ppSB = NULL;
-	}
-	
-	return result;
+	return original->EndStateBlock(ppSB);
 }
 
 HRESULT ProxyIDirect3DDevice9::SetClipStatus(CONST D3DCLIPSTATUS9* pClipStatus)
@@ -791,71 +490,13 @@ HRESULT ProxyIDirect3DDevice9::GetClipStatus(D3DCLIPSTATUS9* pClipStatus)
 HRESULT ProxyIDirect3DDevice9::GetTexture(DWORD Stage,IDirect3DBaseTexture9** ppTexture)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, GetTexture);
-
-	if (textures[Stage] != NULL)
-	{
-		if (ppTexture != NULL)
-		{
-			textures[Stage]->AddRef();
-			*ppTexture = textures[Stage];
-		}
-
-		return S_OK;
-	}
-
-	IDirect3DBaseTexture9* originalTexture = NULL;
-	HRESULT result = original->GetTexture(Stage,&originalTexture);
-	if (!FAILED(result) && originalTexture != NULL)
-	{
-		if (ppTexture != NULL)
-		{
-			textures[Stage] = new ProxyIDirect3DBaseTexture9(originalTexture, this, "<get-texture>");
-			*ppTexture = textures[Stage];
-		}
-	}
-	else if (ppTexture != NULL)
-	{
-		*ppTexture = NULL;
-	}
-
-	return result;
+	return original->GetTexture(Stage, ppTexture);
 }
 
 HRESULT ProxyIDirect3DDevice9::SetTexture(DWORD Stage,IDirect3DBaseTexture9* pTexture)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, SetTexture);
-	
-
-	ProxyIDirect3DBaseTexture9* proxyTexture = dynamic_cast<ProxyIDirect3DBaseTexture9*>(pTexture);
-
-	if (pTexture != textures[Stage])
-	{
-
-		textures[Stage] = proxyTexture;
-
-		//
-		// Bound textures have been changed, compute total.
-		//
-		maxTextureIndexBound = 0;
-
-		for (unsigned int textureIndex = 0; textureIndex < textures.size(); ++textureIndex) //todo: this seems a bit wasteful.
-		{
-			if (textures[textureIndex] != NULL)
-			{
-				maxTextureIndexBound = textureIndex;
-			}
-		}
-	}
-
-	if (proxyTexture == NULL)
-	{
-		return original->SetTexture(Stage,NULL);
-	}
-	else
-	{
-		return original->SetTexture(Stage,proxyTexture->GetOriginal());
-	}
-
+	return original->SetTexture(Stage, pTexture);
 }
 
 HRESULT ProxyIDirect3DDevice9::GetTextureStageState(DWORD Stage,D3DTEXTURESTAGESTATETYPE Type,DWORD* pValue)
@@ -941,164 +582,42 @@ float ProxyIDirect3DDevice9::GetNPatchMode()
 
 HRESULT ProxyIDirect3DDevice9::DrawPrimitive(D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount)
 {
-	++drawCallsThisFrame;
-
-	DX_RECORD_DRAW_CALL(IDirect3DDevice9, DrawPrimitive);
-	
-
-	if (!InvestigoSingleton::Instance()->DrawCallsEnabled())
-	{
-		return S_OK;
-	}
-
-    HRESULT res = original->DrawPrimitive(PrimitiveType,StartVertex,PrimitiveCount);
-
-	DX_DRAW_CALL_SUSPEND_POINT(IDirect3DDevice9, DrawPrimitive);
-
-	return res;
+	return original->DrawPrimitive(PrimitiveType, StartVertex, PrimitiveCount);
 }
 
 HRESULT ProxyIDirect3DDevice9::DrawIndexedPrimitive(D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount)
 {
-	++drawCallsThisFrame;
-
-	DX_RECORD_DRAW_CALL(IDirect3DDevice9, DrawIndexedPrimitive);
-	
-
-	if (!InvestigoSingleton::Instance()->DrawCallsEnabled())
-	{
-		return S_OK;
-	}
-
-    HRESULT res = original->DrawIndexedPrimitive(PrimitiveType,BaseVertexIndex,MinVertexIndex,NumVertices,startIndex,primCount);
-
-	DX_DRAW_CALL_SUSPEND_POINT(IDirect3DDevice9, DrawIndexedPrimitive);
-
-	return res;
+	return original->DrawIndexedPrimitive(PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
 }
 
 HRESULT ProxyIDirect3DDevice9::DrawPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType,UINT PrimitiveCount,CONST void* pVertexStreamZeroData,UINT VertexStreamZeroStride)
 {
-	++drawCallsThisFrame;
-
-	DX_RECORD_DRAW_CALL(IDirect3DDevice9, DrawPrimitiveUP);
-	
-
-	if (!InvestigoSingleton::Instance()->DrawCallsEnabled())
-	{
-		return S_OK;
-	}
-
-	HRESULT res = original->DrawPrimitiveUP(PrimitiveType,PrimitiveCount,pVertexStreamZeroData,VertexStreamZeroStride);
-
-	DX_DRAW_CALL_SUSPEND_POINT(IDirect3DDevice9, DrawPrimitiveUP);
-
-	return res;
+	return original->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
 }
 
 HRESULT ProxyIDirect3DDevice9::DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType,UINT MinVertexIndex,UINT NumVertices,UINT PrimitiveCount,CONST void* pIndexData,D3DFORMAT IndexDataFormat,CONST void* pVertexStreamZeroData,UINT VertexStreamZeroStride)
 {
-	++drawCallsThisFrame;
-
-	DX_RECORD_DRAW_CALL(IDirect3DDevice9, DrawIndexedPrimitiveUP);
-	
-
-	if (!InvestigoSingleton::Instance()->DrawCallsEnabled())
-	{
-		return S_OK;
-	}
-
-	HRESULT res = original->DrawIndexedPrimitiveUP(PrimitiveType,MinVertexIndex,NumVertices,PrimitiveCount, pIndexData, IndexDataFormat, pVertexStreamZeroData,VertexStreamZeroStride);
-
-	DX_DRAW_CALL_SUSPEND_POINT(IDirect3DDevice9, DrawIndexedPrimitiveUP);
-
-	return res;
+	return original->DrawIndexedPrimitiveUP(PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData, IndexDataFormat, pVertexStreamZeroData, VertexStreamZeroStride);
 }
 
 HRESULT ProxyIDirect3DDevice9::ProcessVertices(UINT SrcStartIndex,UINT DestIndex,UINT VertexCount,IDirect3DVertexBuffer9* pDestBuffer,IDirect3DVertexDeclaration9* pVertexDecl,DWORD Flags)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, ProcessVertices);
-
-	ProxyIDirect3DVertexDeclaration9* proxyVertexDecl = dynamic_cast<ProxyIDirect3DVertexDeclaration9*>(pVertexDecl); 
-	ProxyIDirect3DVertexBuffer9* proxyDestBuffer = dynamic_cast<ProxyIDirect3DVertexBuffer9*>(pDestBuffer); 
-	return original->ProcessVertices(SrcStartIndex, DestIndex, VertexCount, proxyDestBuffer->GetOriginal(), proxyVertexDecl->GetOriginal(), Flags);
+	return original->ProcessVertices(SrcStartIndex, DestIndex, VertexCount, pDestBuffer, pVertexDecl, Flags);
 }
 
 HRESULT ProxyIDirect3DDevice9::CreateVertexDeclaration(CONST D3DVERTEXELEMENT9* pVertexElements,IDirect3DVertexDeclaration9** ppDecl)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, CreateVertexDeclaration);
-	
-
-	IDirect3DVertexDeclaration9* originalVertexDecl = NULL;
-    HRESULT result = original->CreateVertexDeclaration(pVertexElements,&originalVertexDecl);
-	if (!FAILED(result) && originalVertexDecl != NULL)
-	{
-		if (ppDecl != NULL)
-		{
-            *ppDecl = new ProxyIDirect3DVertexDeclaration9(originalVertexDecl, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-		}
-	}
-	else if (ppDecl != NULL)
-	{
-		*ppDecl = NULL;
-	}
-	
-	return result;
+	return original->CreateVertexDeclaration(pVertexElements, ppDecl);
 }
 
 HRESULT ProxyIDirect3DDevice9::SetVertexDeclaration(IDirect3DVertexDeclaration9* pDecl)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, SetVertexDeclaration);
-	
-
-	ProxyIDirect3DVertexDeclaration9* proxyDecl = dynamic_cast<ProxyIDirect3DVertexDeclaration9*>(pDecl); 
-
-	if (pDecl != curVertexDecl)
-	{
-		curVertexDecl = proxyDecl;
-	}
-
-	if (pDecl == NULL)
-	{
-		return original->SetVertexDeclaration(NULL);
-	}
-	else
-	{
-		return original->SetVertexDeclaration(proxyDecl->GetOriginal());
-	}
+	return original->SetVertexDeclaration(pDecl);
 }
 
 HRESULT ProxyIDirect3DDevice9::GetVertexDeclaration(IDirect3DVertexDeclaration9** ppDecl)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, GetVertexDeclaration);
-
-	if (curVertexDecl != NULL)
-	{
-		if (ppDecl != NULL)
-		{
-			curVertexDecl->AddRef();
-			*ppDecl = curVertexDecl;
-		}
-
-		return S_OK;
-	}
-
-	IDirect3DVertexDeclaration9* originalVertexDecl = NULL;
-    HRESULT result = original->GetVertexDeclaration(&originalVertexDecl);
-	if (!FAILED(result) && originalVertexDecl != NULL)
-	{
-		if (ppDecl != NULL)
-		{
-			curVertexDecl = new ProxyIDirect3DVertexDeclaration9(originalVertexDecl, this, "VertexDeclaration");
-			*ppDecl = curVertexDecl;
-		}
-	}
-	else if (ppDecl != NULL)
-	{
-		*ppDecl = NULL;
-	}
-	
-    return result;
+	return original->GetVertexDeclaration(ppDecl);
 }
 
 HRESULT ProxyIDirect3DDevice9::SetFVF(DWORD FVF)
@@ -1116,79 +635,17 @@ HRESULT ProxyIDirect3DDevice9::GetFVF(DWORD* pFVF)
 
 HRESULT ProxyIDirect3DDevice9::CreateVertexShader(CONST DWORD* pFunction,IDirect3DVertexShader9** ppShader)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, CreateVertexShader);
-	
-
-	IDirect3DVertexShader9* originalShader = NULL;
-    HRESULT result = original->CreateVertexShader(pFunction,&originalShader);
-	if (!FAILED(result) && originalShader != NULL)
-	{
-		*ppShader = new ProxyIDirect3DVertexShader9(originalShader, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-	}
-	else
-	{
-		*ppShader = NULL;
-	}
-
-	return result;
+	return original->CreateVertexShader(pFunction, ppShader);
 }
 
 HRESULT ProxyIDirect3DDevice9::SetVertexShader(IDirect3DVertexShader9* pShader)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, SetVertexShader);
-	
-
-	ProxyIDirect3DVertexShader9* proxyShader = dynamic_cast<ProxyIDirect3DVertexShader9*>(pShader);
-	IDirect3DVertexShader9* actualShader = proxyShader != NULL ? proxyShader->GetOriginal() : NULL;
-	IDirect3DVertexShader9* curActualShader = curVertexShader != NULL ? curVertexShader->GetOriginal() : NULL;
-
-	if (actualShader != curActualShader)
-	{
-		curVertexShader = proxyShader;
-	}
-
-
-	if (proxyShader == NULL)
-	{
-		return original->SetVertexShader(NULL);
-	}
-	else
-	{		
-		return original->SetVertexShader(actualShader);
-	}
+	return original->SetVertexShader(pShader);
 }
 
 HRESULT ProxyIDirect3DDevice9::GetVertexShader(IDirect3DVertexShader9** ppShader)
 {
-	DX_RECORD_API_CALL(IDirect3DDevice9, GetVertexShader);
-
-	if (curVertexShader != NULL)
-	{
-		if (ppShader != NULL)
-		{
-			curVertexShader->AddRef();
-			*ppShader = curVertexShader;
-		}
-
-		return S_OK;
-	}
-
-	IDirect3DVertexShader9* originalShader = NULL;
-	HRESULT result = original->GetVertexShader(&originalShader);
-	if (!FAILED(result) && originalShader != NULL)
-	{
-		if (ppShader != NULL)
-		{
-			curVertexShader = new ProxyIDirect3DVertexShader9(originalShader, this, "unknown");
-			*ppShader = curVertexShader;
-		}
-	}
-	else if (ppShader != NULL)
-	{
-		*ppShader = NULL;
-	}
-
-	return result;
+	return original->GetVertexShader(ppShader);
 }
 
 HRESULT ProxyIDirect3DDevice9::SetVertexShaderConstantF(UINT StartRegister,CONST float* pConstantData,UINT Vector4fCount)
@@ -1233,60 +690,13 @@ HRESULT ProxyIDirect3DDevice9::GetVertexShaderConstantB(UINT StartRegister,BOOL*
 HRESULT ProxyIDirect3DDevice9::SetStreamSource(UINT StreamNumber,IDirect3DVertexBuffer9* pStreamData,UINT OffsetInBytes,UINT Stride)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, SetStreamSource);
-	
-
-	ProxyIDirect3DVertexBuffer9* proxyStreamData = dynamic_cast<ProxyIDirect3DVertexBuffer9*>(pStreamData); 
-	if (pStreamData != streams[StreamNumber])
-	{
-		streams[StreamNumber] = proxyStreamData;
-	}
-
-	if (pStreamData == NULL)
-	{
-		HRESULT result = original->SetStreamSource(StreamNumber,NULL,OffsetInBytes,Stride);
-		return result;
-	}
-	else
-	{		
-		assert(proxyStreamData != NULL);
-		HRESULT result = original->SetStreamSource(StreamNumber,proxyStreamData->GetOriginal(),OffsetInBytes,Stride);
-		return result;
-	}
+	return original->SetStreamSource(StreamNumber, pStreamData, OffsetInBytes, Stride);
 }
 
 HRESULT ProxyIDirect3DDevice9::GetStreamSource(UINT StreamNumber,IDirect3DVertexBuffer9** ppStreamData,UINT* OffsetInBytes,UINT* pStride)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, GetStreamSource);
-
-	if (streams[StreamNumber] != NULL)
-	{
-		if (ppStreamData != NULL)
-		{
-			streams[StreamNumber]->AddRef();
-			*ppStreamData = streams[StreamNumber];
-		}
-
-		return S_OK;
-	}
-
-	IDirect3DVertexBuffer9* originalVertexBuffer = NULL;
-    HRESULT result = original->GetStreamSource(StreamNumber,&originalVertexBuffer,OffsetInBytes,pStride); //todo: might be good to pass in NULL if ppStreamData is set to NULL.
-	if (!FAILED(result) && originalVertexBuffer != NULL)
-	{
-		if (ppStreamData != NULL)
-		{
-			*ppStreamData = new ProxyIDirect3DVertexBuffer9(originalVertexBuffer, this, (boost::format("VertexBuffer_%d") % StreamNumber).str());
-		}
-	}
-	else
-	{
-		if (ppStreamData != NULL)
-		{
-			*ppStreamData = NULL;
-		}
-	}
-	
-    return result;
+	return original->GetStreamSource(StreamNumber, ppStreamData, OffsetInBytes, pStride);
 }
 
 HRESULT ProxyIDirect3DDevice9::SetStreamSourceFreq(UINT StreamNumber,UINT Divider)
@@ -1305,137 +715,31 @@ HRESULT ProxyIDirect3DDevice9::GetStreamSourceFreq(UINT StreamNumber,UINT* Divid
 HRESULT ProxyIDirect3DDevice9::SetIndices(IDirect3DIndexBuffer9* pIndexData)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, SetIndices);
-	
-
-	ProxyIDirect3DIndexBuffer9* pProxyIndexData = dynamic_cast<ProxyIDirect3DIndexBuffer9*>(pIndexData);
-	if (pIndexData != indexBuffer)
-	{
-		indexBuffer = pProxyIndexData;
-	}
-
-	if (pIndexData == NULL)
-	{
-		HRESULT result = original->SetIndices(NULL);
-		return result;
-	}
-	else
-	{		
-		assert(pProxyIndexData != NULL);
-		HRESULT result = original->SetIndices(pProxyIndexData->GetOriginal());
-		return result;
-	}
+	return original->SetIndices(pIndexData);
 }
 
 HRESULT ProxyIDirect3DDevice9::GetIndices(IDirect3DIndexBuffer9** ppIndexData)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, GetIndices);
-
-	if (indexBuffer != NULL)
-	{
-		if (ppIndexData != NULL)
-		{
-			indexBuffer->AddRef();
-			*ppIndexData = indexBuffer;
-		}
-
-		return S_OK;		
-	}
-
-	IDirect3DIndexBuffer9* originalIndexBuffer = NULL;
-    HRESULT result = original->GetIndices(&originalIndexBuffer);
-	if (!FAILED(result) && originalIndexBuffer != NULL)
-	{
-		if (ppIndexData != NULL)
-		{
-			*ppIndexData = new ProxyIDirect3DIndexBuffer9(originalIndexBuffer, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-		}
-	}
-	else
-	{
-		if (ppIndexData != NULL)
-		{
-			*ppIndexData = NULL;
-		}
-	}
-	
-    return result;
+	return original->GetIndices(ppIndexData);
 }
 
 HRESULT ProxyIDirect3DDevice9::CreatePixelShader(CONST DWORD* pFunction,IDirect3DPixelShader9** ppShader)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, CreatePixelShader);
-	
-
-	IDirect3DPixelShader9* originalShader = NULL;
-    HRESULT result = original->CreatePixelShader(pFunction,&originalShader);
-	if (!FAILED(result) && originalShader != NULL)
- 	{
-        *ppShader = new ProxyIDirect3DPixelShader9(originalShader, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-	}
-	else
-	{
-		*ppShader = NULL;
-	}
-
-	return result;
+	return original->CreatePixelShader(pFunction, ppShader);
 }
 
 HRESULT ProxyIDirect3DDevice9::SetPixelShader(IDirect3DPixelShader9* pShader)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, SetPixelShader);
-	
-
-	ProxyIDirect3DPixelShader9* proxyShader = dynamic_cast<ProxyIDirect3DPixelShader9*>(pShader);
-	IDirect3DPixelShader9* pActualShader = proxyShader != NULL ? proxyShader->GetOriginal() : NULL;
-	IDirect3DPixelShader9* pCurSetShader = curPixelShader != NULL ? curPixelShader->GetOriginal() : NULL;
-
-	if (pActualShader != pCurSetShader)
-	{
-		curPixelShader = proxyShader;
-	}
-
-	if (pShader == NULL)
-	{
-		HRESULT result = original->SetPixelShader(NULL);
-		return result;
-	}
-	else
-	{		
-		return original->SetPixelShader(proxyShader->GetOriginal());
-	}
+	return original->SetPixelShader(pShader);
 }
 
 HRESULT ProxyIDirect3DDevice9::GetPixelShader(IDirect3DPixelShader9** ppShader)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, GetPixelShader);
-
-	if (curPixelShader != NULL)
-	{
-		if (ppShader != NULL)
-		{
-			curPixelShader->AddRef();
-			*ppShader = curPixelShader;
-		}
-
-		return S_OK;
-	}
-
-	IDirect3DPixelShader9* originalShader = NULL;
-	HRESULT result = original->GetPixelShader(&originalShader);
-	if (!FAILED(result) && originalShader != NULL)
-	{
-		if (ppShader != NULL)
-		{
-			curPixelShader = new ProxyIDirect3DPixelShader9(originalShader, this, "unknown");
-			*ppShader = curPixelShader;
-		}
-	}
-	else if (ppShader != NULL)
-	{
-		*ppShader = NULL;
-	}
-
-	return result;	
+	return original->GetPixelShader(ppShader);
 }
 
 HRESULT ProxyIDirect3DDevice9::SetPixelShaderConstantF(UINT StartRegister,CONST float* pConstantData,UINT Vector4fCount)
@@ -1498,21 +802,7 @@ HRESULT ProxyIDirect3DDevice9::DeletePatch(UINT Handle)
 HRESULT ProxyIDirect3DDevice9::CreateQuery(D3DQUERYTYPE Type,IDirect3DQuery9** ppQuery)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, CreateQuery);
-
-	IDirect3DQuery9* originalQuery = NULL;
-	HRESULT result = original->CreateQuery(Type, ppQuery == NULL ? NULL : &originalQuery);
-	if (ppQuery != NULL)
-	{
-		if (!FAILED(result) && originalQuery != NULL)
-		{
-			*ppQuery = new ProxyIDirect3DQuery9(originalQuery, this, InvestigoSingleton::Instance()->FormatCurrentResourceName());
-		}
-		else
-		{
-			*ppQuery = NULL;
-		}
-	}
-	return result;
+	return original->CreateQuery(Type, ppQuery);
 }
 
 //
@@ -1567,22 +857,10 @@ void ProxyIDirect3DDevice9::GetBackbufferScreenshot(std::vector<unsigned char>& 
 
 	pSurface->Release();
 	*/
+	boost::unique_lock<boost::mutex> lock(screenshotMutex);
+	data.resize(screenshotData.size());
+	memcpy(&data[0], &screenshotData[0], screenshotData.size());
 
-	LPDIRECT3DSURFACE9 backBuf;
-	if (!FAILED(original->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuf)))
-	{
-		LPD3DXBUFFER buffer = NULL;
-		if (!FAILED(D3DXSaveSurfaceToFileInMemory(&buffer, D3DXIFF_JPG, backBuf, NULL, NULL)))
-		{
-			int size = buffer->GetBufferSize();
-			data.resize(size);
-			memcpy(&data[0], buffer->GetBufferPointer(), size);
-
-			buffer->Release();
-		}
-
-		backBuf->Release();
-	}
 }
 
 //

@@ -29,22 +29,7 @@ ProxyIDirect3DIndexBuffer9::~ProxyIDirect3DIndexBuffer9()
 /*todo: can this be moved to base class? */
 HRESULT __stdcall ProxyIDirect3DIndexBuffer9::QueryInterface(REFIID riid, void** ppvObj)
 {
-	*ppvObj = NULL;
-
-    if (riid == __uuidof(Investigo::IResource))
-    {
-        AddRef();
-        *ppvObj = static_cast<Investigo::IResource*>(this);
-        return S_OK;
-    }
-
-	HRESULT result = original->QueryInterface(riid, ppvObj);
-	if (result == S_OK)
-	{
-		*ppvObj = this;
-	}
-
-	return result;
+	return original->QueryInterface(riid, ppvObj);
 }
 
 ULONG __stdcall ProxyIDirect3DIndexBuffer9::AddRef()
@@ -66,9 +51,7 @@ ULONG __stdcall ProxyIDirect3DIndexBuffer9::Release()
 /*** IDirect3DResource9 methods ***/
 HRESULT __stdcall ProxyIDirect3DIndexBuffer9::GetDevice(IDirect3DDevice9** ppDevice)
 {
-	proxyDevice->AddRef();
-	*ppDevice = proxyDevice;
-	return S_OK;
+	return original->GetDevice(ppDevice);
 }
 
 HRESULT __stdcall ProxyIDirect3DIndexBuffer9::SetPrivateData(REFGUID refguid,CONST void* pData,DWORD SizeOfData,DWORD Flags)

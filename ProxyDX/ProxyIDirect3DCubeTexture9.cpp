@@ -18,22 +18,7 @@
 /*** IUnknown methods ***/
 HRESULT __stdcall ProxyIDirect3DCubeTexture9::QueryInterface(REFIID riid, void** ppvObj)
 {
-	*ppvObj = NULL;
-
-    if (riid == __uuidof(Investigo::IResource))
-    {
-        AddRef();
-        *ppvObj = static_cast<Investigo::IResource*>(this);
-        return S_OK;
-    }
-
-	HRESULT result = original->QueryInterface(riid, ppvObj);
-	if (result == S_OK)
-	{
-		*ppvObj = this;
-	}
-
-	return result;
+	return original->QueryInterface(riid, ppvObj);
 }
 
 ULONG __stdcall ProxyIDirect3DCubeTexture9::AddRef()
@@ -55,9 +40,7 @@ ULONG __stdcall ProxyIDirect3DCubeTexture9::Release()
 /*** IDirect3DBaseTexture9 methods ***/
 HRESULT __stdcall ProxyIDirect3DCubeTexture9::GetDevice(IDirect3DDevice9** ppDevice)
 {
-	proxyDevice->AddRef();
-	*ppDevice = proxyDevice;
-	return S_OK;
+	return original->GetDevice(ppDevice);
 }
 
 HRESULT __stdcall ProxyIDirect3DCubeTexture9::SetPrivateData(REFGUID refguid,CONST void* pData,DWORD SizeOfData,DWORD Flags)
@@ -132,18 +115,7 @@ HRESULT __stdcall ProxyIDirect3DCubeTexture9::GetLevelDesc(UINT Level,D3DSURFACE
 
 HRESULT __stdcall ProxyIDirect3DCubeTexture9::GetCubeMapSurface(D3DCUBEMAP_FACES FaceType,UINT Level,IDirect3DSurface9** ppCubeMapSurface)
 {
-	IDirect3DSurface9* originalSurface = NULL;
-    HRESULT result = original->GetCubeMapSurface(FaceType,Level,&originalSurface);
-	if (!FAILED(result))
-	{
-        *ppCubeMapSurface = new ProxyIDirect3DSurface9(originalSurface, proxyDevice, GetName());
-	}
-	else
-	{
-		*ppCubeMapSurface = NULL;
-	}
-
-	return result;
+	return original->GetCubeMapSurface(FaceType, Level, ppCubeMapSurface);
 }
 
 HRESULT __stdcall ProxyIDirect3DCubeTexture9::LockRect(D3DCUBEMAP_FACES FaceType,UINT Level,D3DLOCKED_RECT* pLockedRect,CONST RECT* pRect,DWORD Flags)

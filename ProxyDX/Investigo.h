@@ -516,7 +516,7 @@ private:
     //
     // Set to 'true' when the HUD has been initialized.
     //
-	bool hudInitialized;
+	IDirect3DDevice9* hudDeviceInitialized;
 
     //
     // Resources for HUD rendering.

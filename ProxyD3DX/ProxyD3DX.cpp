@@ -13,6 +13,7 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "ProxyD3DX.h"
 #include "ProxyID3DXEffect.h"
+#include "ProxyID3DXFont.h"
 
 #include "..\ProxyDX\InvestigoApplicationInterface.h"
 #pragma pack(1)
@@ -970,6 +971,25 @@ extern "C" __declspec(naked) void __stdcall __E__64__()
 		}
 	}
 
+// D3DXCreateFontA
+//HRESULT __stdcall __E__64__(
+//	LPDIRECT3DDEVICE9 pDevice, INT Height, UINT Width, UINT Weight, UINT MipLevels, BOOL Italic, DWORD CharSet, DWORD OutputPrecision, DWORD Quality, DWORD PitchAndFamily, LPCSTR pFaceName, LPD3DXFONT* ppFont)
+//{
+//	FILE * pFile = NULL;
+//	int iErr = 0;
+//	iErr = fopen_s(&pFile, "d3dx.log", "a+");
+//	fputs("D3DXCreateFontA\n", pFile);
+//	fclose(pFile);
+//
+//	typedef HRESULT(WINAPI* D3DXCreateFontA)(LPDIRECT3DDEVICE9, INT, UINT, UINT, UINT, BOOL, DWORD, DWORD, DWORD, DWORD, LPCSTR, LPD3DXFONT*);
+//	LPD3DXFONT pOriginal = NULL;
+//	HRESULT result = ((D3DXCreateFontA)p[64])(pDevice, Height, Width, Weight, MipLevels, Italic, CharSet, OutputPrecision, Quality, PitchAndFamily, pFaceName, &pOriginal);
+//	ProxyID3DXFont* pProxy = new ProxyID3DXFont(pOriginal);
+//	*ppFont = pProxy;
+//	return result;
+//}
+
+
 // D3DXCreateFontIndirectA
 extern "C" __declspec(naked) void __stdcall __E__65__()
 	{
@@ -997,6 +1017,35 @@ extern "C" __declspec(naked) void __stdcall __E__67__()
 		}
 	}
 
+// D3DXCreateFontA
+//HRESULT __stdcall __E__67__(
+//	LPDIRECT3DDEVICE9       pDevice,
+//	INT                     Height,
+//	UINT                    Width,
+//	UINT                    Weight,
+//	UINT                    MipLevels,
+//	BOOL                    Italic,
+//	DWORD                   CharSet,
+//	DWORD                   OutputPrecision,
+//	DWORD                   Quality,
+//	DWORD                   PitchAndFamily,
+//	LPCWSTR                 pFaceName,
+//	LPD3DXFONT*             ppFont)
+//{
+//	FILE * pFile = NULL;
+//	int iErr = 0;
+//	iErr = fopen_s(&pFile, "d3dx.log", "a+");
+//	fputs("D3DXCreateFontW\n", pFile);
+//	fclose(pFile);
+//
+//	typedef HRESULT(WINAPI* D3DXCreateFontW)(LPDIRECT3DDEVICE9, INT, UINT, UINT, UINT, BOOL, DWORD, DWORD, DWORD, DWORD, LPCWSTR, LPD3DXFONT*);
+//	LPD3DXFONT pOriginal = NULL;
+//	HRESULT result = ((D3DXCreateFontW)p[67])(pDevice, Height, Width, Weight, MipLevels, Italic, CharSet, OutputPrecision, Quality, PitchAndFamily, pFaceName, &pOriginal);
+//	ProxyID3DXFont* pProxy = new ProxyID3DXFont(pOriginal);
+//	*ppFont = pProxy;
+//	return result;
+//}
+//
 // D3DXCreateKeyframedAnimationSet
 extern "C" __declspec(naked) void __stdcall __E__68__()
 	{

@@ -261,5 +261,13 @@ private:
 	HWND focusWindow;
 	DWORD behaviorFlags;
 	D3DPRESENT_PARAMETERS presentationParameters;
+
+
+
+	//
+	// Mutex used to lock access to the DX interfaces.
+	//
+	boost::mutex screenshotMutex;
+	std::vector<unsigned char> screenshotData;
 };
 

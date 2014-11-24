@@ -223,7 +223,7 @@ void DXHttpServer::GetBackBufferScreenshotCallback(const char* url, const HttpSe
 {
 	boost::unique_lock<boost::mutex> lock(directXMutex); // Lock so that only 1 HTTP server thread can access the DX interfaces at a time.
 
-	mimeType = "image/jpeg";
+	mimeType = "image/png";
 	InvestigoSingleton::Instance()->GetBackbufferScreenshot(data);
 }
 
