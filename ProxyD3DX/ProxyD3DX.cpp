@@ -23,13 +23,23 @@ HINSTANCE hLThis = 0;
 HINSTANCE hL = 0;
 FARPROC p[329] = {0};
 
+void log(const char* x) {
+	FILE * pFile = NULL;
+	fopen_s(&pFile, "d3dx.log", "a");
+	fputs(x, pFile);
+	fputs("\n", pFile);
+	fclose(pFile);
+}
+
 BOOL WINAPI DllMain(HINSTANCE hInst,DWORD reason,LPVOID)
 {
+	log("loaded");
 	if (reason == DLL_PROCESS_ATTACH)
 		{
 		hLThis = hInst;
-		hL = LoadLibraryA("c:\\Windows\\SysWOW64\\D3dx9_43.dll");
+		hL = LoadLibraryA("c:\\Windows\\SysWow64\\D3dx9_43.dll");
 		if (!hL) return false;
+		log("reading...");
 
 
 		p[0] = GetProcAddress(hL,"D3DXAssembleShader");
@@ -681,6 +691,7 @@ extern "C" __declspec(naked) void __stdcall __E__33__()
 // D3DXCreateBuffer
 extern "C" __declspec(naked) void __stdcall __E__34__()
 	{
+	log("D3DXCreateBuffer");
 	__asm
 		{
 		jmp p[34*4];
@@ -879,7 +890,7 @@ HRESULT __stdcall __E__55__(
         LPD3DXEFFECT*                   ppEffect,
         LPD3DXBUFFER*                   ppCompilationErrors)
 {
-
+	log("D3DXCreateEffectFromFileA");
     Investigo::ResourceBegin(pSrcFile);
 	typedef HRESULT (WINAPI* pfnD3DXCreateEffectFromFileA)(LPDIRECT3DDEVICE9, LPCSTR, CONST D3DXMACRO*, LPD3DXINCLUDE, DWORD, LPD3DXEFFECTPOOL, LPD3DXEFFECT*, LPD3DXBUFFER*);
 	LPD3DXEFFECT pOriginal = NULL;
@@ -975,11 +986,7 @@ extern "C" __declspec(naked) void __stdcall __E__63__()
 HRESULT __stdcall __E__64__(
 	LPDIRECT3DDEVICE9 pDevice, INT Height, UINT Width, UINT Weight, UINT MipLevels, BOOL Italic, DWORD CharSet, DWORD OutputPrecision, DWORD Quality, DWORD PitchAndFamily, LPCSTR pFaceName, LPD3DXFONT* ppFont)
 {
-	FILE * pFile = NULL;
-	int iErr = 0;
-	iErr = fopen_s(&pFile, "d3dx.log", "a");
-	fputs("D3DXCreateFontA\n", pFile);
-	fclose(pFile);
+	log("D3DXCreateFontA called");
 
 	typedef HRESULT(WINAPI* D3DXCreateFontA)(LPDIRECT3DDEVICE9, INT, UINT, UINT, UINT, BOOL, DWORD, DWORD, DWORD, DWORD, LPCSTR, LPD3DXFONT*);
 	LPD3DXFONT pOriginal = NULL;
@@ -993,6 +1000,7 @@ HRESULT __stdcall __E__64__(
 // D3DXCreateFontIndirectA
 extern "C" __declspec(naked) void __stdcall __E__65__()
 	{
+	log("D3DXCreateFontIndirectA called");
 	__asm
 		{
 		jmp p[65*4];
@@ -1002,6 +1010,7 @@ extern "C" __declspec(naked) void __stdcall __E__65__()
 // D3DXCreateFontIndirectW
 extern "C" __declspec(naked) void __stdcall __E__66__()
 	{
+	log("D3DXCreateFontIndirectW called");
 	__asm
 		{
 		jmp p[66*4];
@@ -1032,11 +1041,7 @@ HRESULT __stdcall __E__67__(
 	LPCWSTR                 pFaceName,
 	LPD3DXFONT*             ppFont)
 {
-	FILE * pFile = NULL;
-	int iErr = 0;
-	iErr = fopen_s(&pFile, "d3dx.log", "a");
-	fputs("D3DXCreateFontW\n", pFile);
-	fclose(pFile);
+	log("D3DXCreateFontA called");
 
 	typedef HRESULT(WINAPI* D3DXCreateFontW)(LPDIRECT3DDEVICE9, INT, UINT, UINT, UINT, BOOL, DWORD, DWORD, DWORD, DWORD, LPCWSTR, LPD3DXFONT*);
 	LPD3DXFONT pOriginal = NULL;
@@ -1058,6 +1063,7 @@ extern "C" __declspec(naked) void __stdcall __E__68__()
 // D3DXCreateLine
 extern "C" __declspec(naked) void __stdcall __E__69__()
 	{
+	log("D3DXCreateLine");
 	__asm
 		{
 		jmp p[69*4];
@@ -1075,7 +1081,8 @@ extern "C" __declspec(naked) void __stdcall __E__70__()
 
 // D3DXCreateMesh
 extern "C" __declspec(naked) void __stdcall __E__71__()
-	{
+{
+	log("D3DXCreateMesh");
 	__asm
 		{
 		jmp p[71*4];
@@ -1247,6 +1254,7 @@ extern "C" __declspec(naked) void __stdcall __E__89__()
 // D3DXCreateTextA
 extern "C" __declspec(naked) void __stdcall __E__90__()
 	{
+	log("D3DXCreateTextA");
 	__asm
 		{
 		jmp p[90*4];
@@ -1256,6 +1264,7 @@ extern "C" __declspec(naked) void __stdcall __E__90__()
 // D3DXCreateTextW
 extern "C" __declspec(naked) void __stdcall __E__91__()
 	{
+	log("D3DXCreateTextW");
 	__asm
 		{
 		jmp p[91*4];
