@@ -269,5 +269,8 @@ private:
 	//
 	boost::mutex screenshotMutex;
 	std::vector<unsigned char> screenshotData;
+
+
+	ID3DXSprite* pSprite;
 };
 

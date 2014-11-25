@@ -45,7 +45,8 @@ ProxyIDirect3DDevice9::ProxyIDirect3DDevice9(IDirect3DDevice9* _original, UINT _
 	presentationParameters(*_presentationParameters),
 	drawCallsLastFrame(0),
 	drawCallsThisFrame(0),
-	maxTextureIndexBound(0)
+	maxTextureIndexBound(0),
+	pSprite(NULL)
 {
 	//char buf[1024];
 	//sprintf(buf, "ProxyIDirect3DDevice9::ProxyIDirect3DDevice9: 0x%X\n", this);
@@ -165,10 +166,42 @@ HRESULT ProxyIDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
 {
 	//todo: need to release and restore all cached proxies.
 	//todo: record updated presentation parameters.
+	if (pSprite != NULL) {
+		pSprite->Release();
+		pSprite = NULL;
+	}
 
 	InvestigoSingleton::Instance()->ResetHUD();
     return original->Reset(pPresentationParameters);
 }
+
+void log(const char* x) {
+	FILE * pFile = NULL;
+	fopen_s(&pFile, "d3device.log", "a");
+	if (pFile != NULL) {
+		fputs(x, pFile);
+		fputs("\n", pFile);
+		fclose(pFile);
+	}
+}
+//
+//struct PixelShaderInput
+//{
+//	float3 color : COLOR;
+//};
+//
+//struct PixelShaderOutput
+//{
+//	float4 color : SV_TARGET0;
+//};
+//
+//PixelShaderOutput main(PixelShaderInput input)
+//{
+//	PixelShaderOutput output;
+//	output.color.rgba = float4(input.color, 1.0f); // input.color is 0.5, 0.5, 0.5; output is black
+//	// output.color.rgba = float4(0.5f, 0.5f, 0.5f, 1); // output is gray
+//	return output;
+//}
 
 STDMETHODIMP ProxyIDirect3DDevice9::Present(THIS_ CONST RECT* pSourceRect,CONST RECT* pDestRect,HWND hDestWindowOverride,CONST RGNDATA* pDirtyRegion)
 {
@@ -176,33 +209,67 @@ STDMETHODIMP ProxyIDirect3DDevice9::Present(THIS_ CONST RECT* pSourceRect,CONST 
 
 	InvestigoSingleton::Instance()->RenderHUD(original);
 
-	{
-		boost::unique_lock<boost::mutex> lock(screenshotMutex);
+	//{
+	//	boost::unique_lock<boost::mutex> lock(screenshotMutex);
 
-		LPDIRECT3DSURFACE9 backBuf;
-		if (!FAILED(original->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuf)))
-		{
-			LPD3DXBUFFER buffer = NULL;
-			RECT rc;
-			SetRect(&rc, 14, 806, 464, 1038);
-			//SetRect(&rc, 14, 6, 464, 238);
-			if (!FAILED(D3DXSaveSurfaceToFileInMemory(&buffer, D3DXIFF_PNG, backBuf, NULL, &rc)))
-			{
-				int size = buffer->GetBufferSize();
-				screenshotData.resize(size);
-				memcpy(&screenshotData[0], buffer->GetBufferPointer(), size);
+	//	LPDIRECT3DSURFACE9 backBuf;
+	//	if (!FAILED(original->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuf)))
+	//	{
+	//		LPD3DXBUFFER buffer = NULL;
+	//		RECT rc;
+	//		POINT pt;
+	//		//SetRect(&rc, 14, 806, 464, 1038);
+	//		SetRect(&rc, 14, 6, 464, 238);
+	//		pt.x = 0;
+	//		pt.y = 0;
+	//		RECT rcDest;
+	//		SetRect(&rcDest, 0, 0, rc.right - rc.left, rc.bottom - rc.top);
+	//		IDirect3DSurface9* tempsurf;
 
-				buffer->Release();
-			}
-			else {
+	//		D3DSURFACE_DESC desc;
+	//		backBuf->GetDesc(&desc);
+	//		
+	//		if (!FAILED(original->CreateOffscreenPlainSurface(rc.right - rc.left, rc.bottom - rc.top, desc.Format, D3DPOOL_DEFAULT, &tempsurf, NULL)))
+	//		{
+	//			if (pSprite == NULL) {
+	//				D3DXCreateSprite(original, &pSprite);
+	//			}
+	//			original->BeginScene();
+	//			pSprite->Begin(D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE);
 
-			}
-			backBuf->Release();
-		}
-	}
+	//			if (!FAILED(original->StretchRect(backBuf, &rc, tempsurf, &rcDest, D3DTEXF_POINT))) {
+	//			//if (!FAILED(original->UpdateSurface(backBuf, &rc, tempsurf, &pt))) {
+
+	//				//if (!FAILED(D3DXSaveSurfaceToFileInMemory(&buffer, D3DXIFF_DDS, backBuf, NULL, &rc)))
+	//				if (!FAILED(D3DXSaveSurfaceToFileInMemory(&buffer, D3DXIFF_PNG, tempsurf, NULL, NULL)))
+	//				{
+	//					int size = buffer->GetBufferSize();
+	//					screenshotData.resize(size);
+	//					memcpy(&screenshotData[0], buffer->GetBufferPointer(), size);
+
+	//					buffer->Release();
+	//					log("Success");
+	//				}
+	//				else {
+	//					log("failed D3DXSaveSurfaceToFileInMemory");
+	//				}
+	//			}
+	//			else {
+	//				log("failed StretchRect");
+	//			}
+	//			pSprite->End();
+	//			original->EndScene();
+	//			tempsurf->Release();
+	//		}
+	//		else {
+	//			log("failed CreateOffscreenPlainSurface 2");
+	//		}
+	//		backBuf->Release();
+	//	}
+	//}
 
 	HRESULT hres = original->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
-
+	//Sleep(50);
 	InvestigoSingleton::Instance()->NotifyFrameEnd();
 	return hres;
 
