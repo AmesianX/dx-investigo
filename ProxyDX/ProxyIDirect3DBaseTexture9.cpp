@@ -30,7 +30,22 @@ ProxyIDirect3DBaseTexture9::~ProxyIDirect3DBaseTexture9()
 /*** IUnknown methods ***/
 HRESULT __stdcall  ProxyIDirect3DBaseTexture9::QueryInterface(REFIID riid, void** ppvObj) 
 {
-	return original->QueryInterface(riid, ppvObj);
+	*ppvObj = NULL;
+
+    if (riid == __uuidof(Investigo::IResource))
+    {
+        AddRef();
+        *ppvObj = static_cast<Investigo::IResource*>(this);
+        return S_OK;
+    }
+
+	HRESULT result = original->QueryInterface(riid, ppvObj);
+	if (result == S_OK)
+	{
+		*ppvObj = this;
+	}
+
+	return result;
 }
 
 ULONG __stdcall  ProxyIDirect3DBaseTexture9::AddRef()
@@ -41,11 +56,11 @@ ULONG __stdcall  ProxyIDirect3DBaseTexture9::AddRef()
 ULONG __stdcall  ProxyIDirect3DBaseTexture9::Release()
 {
 	ULONG count = original->Release();
-	//if (count == 0)
-	//{
-	//	original = NULL;
-	//	delete this;
-	//}
+	if (count == 0)
+	{
+		original = NULL;
+		delete this;
+	}
 
 	return count;
 }
@@ -53,7 +68,9 @@ ULONG __stdcall  ProxyIDirect3DBaseTexture9::Release()
 /*** IDirect3DBaseTexture9 methods ***/
 HRESULT __stdcall  ProxyIDirect3DBaseTexture9::GetDevice(IDirect3DDevice9** ppDevice)
 {
-	return original->GetDevice(ppDevice);
+	proxyDevice->AddRef();
+	*ppDevice = proxyDevice;
+	return S_OK;
 }
 
 HRESULT __stdcall  ProxyIDirect3DBaseTexture9::SetPrivateData(REFGUID refguid,CONST void* pData,DWORD SizeOfData,DWORD Flags)

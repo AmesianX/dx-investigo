@@ -30,7 +30,22 @@ ProxyIDirect3DVertexShader9::~ProxyIDirect3DVertexShader9()
 /*** IUnknown methods ***/
 HRESULT __stdcall  ProxyIDirect3DVertexShader9::QueryInterface(REFIID riid, void** ppvObj) 
 {
-	return original->QueryInterface(riid, ppvObj);
+	*ppvObj = NULL;
+
+    if (riid == __uuidof(Investigo::IResource))
+    {
+        AddRef();
+        *ppvObj = static_cast<Investigo::IResource*>(this);
+        return S_OK;
+    }
+
+    HRESULT result = original->QueryInterface(riid, ppvObj);
+	if (result == S_OK)
+	{
+		*ppvObj = this;
+	}
+
+	return result;
 }
 
 ULONG __stdcall  ProxyIDirect3DVertexShader9::AddRef()
@@ -52,7 +67,9 @@ ULONG __stdcall  ProxyIDirect3DVertexShader9::Release()
 
 HRESULT __stdcall  ProxyIDirect3DVertexShader9::GetDevice(IDirect3DDevice9** ppDevice)
 {
-	return original->GetDevice(ppDevice);
+	proxyDevice->AddRef();
+	*ppDevice = proxyDevice;
+	return S_OK;
 }
 
 HRESULT __stdcall  ProxyIDirect3DVertexShader9::GetFunction(void*p,UINT* pSizeOfData)

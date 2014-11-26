@@ -34,7 +34,22 @@ ProxyIDirect3DTexture9::~ProxyIDirect3DTexture9()
 /*** IUnknown methods ***/
 HRESULT __stdcall ProxyIDirect3DTexture9::QueryInterface(REFIID riid, void** ppvObj)
 {
-	return original->QueryInterface(riid, ppvObj);
+	*ppvObj = NULL;
+
+    if (riid == __uuidof(Investigo::IResource))
+    {
+        AddRef();
+        *ppvObj = static_cast<Investigo::IResource*>(this);
+        return S_OK;
+    }
+
+	HRESULT result = original->QueryInterface(riid, ppvObj);
+	if (result == S_OK)
+	{
+		*ppvObj = this;
+	}
+
+	return result;
 }
 
 ULONG __stdcall ProxyIDirect3DTexture9::AddRef()
@@ -56,7 +71,9 @@ ULONG __stdcall ProxyIDirect3DTexture9::Release()
 /*** IDirect3DBaseTexture9 methods ***/
 HRESULT __stdcall ProxyIDirect3DTexture9::GetDevice(IDirect3DDevice9** ppDevice)
 {
-	return original->GetDevice(ppDevice);
+	proxyDevice->AddRef();
+	*ppDevice = proxyDevice;
+	return S_OK;
 }
 
 HRESULT __stdcall ProxyIDirect3DTexture9::SetPrivateData(REFGUID refguid,CONST void* pData,DWORD SizeOfData,DWORD Flags)
@@ -131,7 +148,34 @@ HRESULT __stdcall ProxyIDirect3DTexture9::GetLevelDesc(UINT Level,D3DSURFACE_DES
 
 HRESULT __stdcall ProxyIDirect3DTexture9::GetSurfaceLevel(UINT Level,IDirect3DSurface9** ppSurfaceLevel)
 {
-	return original->GetSurfaceLevel(Level, ppSurfaceLevel);
+	if (surfaceLevels.size() > Level && surfaceLevels[Level] != NULL)
+	{
+		if (ppSurfaceLevel != NULL)
+		{
+			surfaceLevels[Level]->AddRef();
+			*ppSurfaceLevel = surfaceLevels[Level];
+		}
+
+		return S_OK;
+	}
+
+	IDirect3DSurface9* originalSurface = NULL;
+	HRESULT result = original->GetSurfaceLevel(Level,&originalSurface);
+	if (!FAILED(result) && originalSurface != NULL && ppSurfaceLevel != NULL)
+	{
+		if (surfaceLevels.size() <= Level)
+		{
+			surfaceLevels.resize(Level+1);
+		}
+		surfaceLevels[Level] = new ProxyIDirect3DSurface9(originalSurface, proxyDevice, (boost::format("%s_%d") % GetName() % Level).str());
+		*ppSurfaceLevel = surfaceLevels[Level];
+	}
+	else if (ppSurfaceLevel != NULL)
+	{
+		*ppSurfaceLevel = NULL;
+	}
+
+	return result;
 }
 
 HRESULT __stdcall ProxyIDirect3DTexture9::LockRect(UINT Level,D3DLOCKED_RECT* pLockedRect,CONST RECT* pRect,DWORD Flags)
