@@ -253,9 +253,9 @@ void log(const char* x) {
 STDMETHODIMP ProxyIDirect3DDevice9::Present(THIS_ CONST RECT* pSourceRect,CONST RECT* pDestRect,HWND hDestWindowOverride,CONST RGNDATA* pDirtyRegion)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, Present)
+	
 
 	InvestigoSingleton::Instance()->RenderHUD(original);
-
 	//{
 	//	boost::unique_lock<boost::mutex> lock(screenshotMutex);
 
@@ -318,13 +318,6 @@ STDMETHODIMP ProxyIDirect3DDevice9::Present(THIS_ CONST RECT* pSourceRect,CONST 
 	HRESULT hres = original->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 	//Sleep(50);
 	InvestigoSingleton::Instance()->NotifyFrameEnd();
-	return hres;
-=======
-
-	HRESULT hres = original->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
-
-	InvestigoSingleton::Instance()->NotifyFrameEnd();
->>>>>>> parent of f43eb43... Started trying to instrument text render
 
 	drawCallsLastFrame = drawCallsThisFrame;
 	drawCallsThisFrame = 0;
@@ -1667,6 +1660,7 @@ void ProxyIDirect3DDevice9::GetBackbufferScreenshot(std::vector<unsigned char>& 
 
 	pSurface->Release();
 	*/
+
 	boost::unique_lock<boost::mutex> lock(screenshotMutex);
 	if (screenshotData.size() == 0) {
 		data.resize(0);
@@ -1674,24 +1668,6 @@ void ProxyIDirect3DDevice9::GetBackbufferScreenshot(std::vector<unsigned char>& 
 	} else {
 		data.resize(screenshotData.size());
 		memcpy(&data[0], &screenshotData[0], screenshotData.size());
-	}
-=======
->>>>>>> parent of f43eb43... Started trying to instrument text render
-
-	LPDIRECT3DSURFACE9 backBuf;
-	if (!FAILED(original->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuf)))
-	{
-		LPD3DXBUFFER buffer = NULL;
-		if (!FAILED(D3DXSaveSurfaceToFileInMemory(&buffer, D3DXIFF_JPG, backBuf, NULL, NULL)))
-		{
-			int size = buffer->GetBufferSize();
-			data.resize(size);
-			memcpy(&data[0], buffer->GetBufferPointer(), size);
-
-			buffer->Release();
-		}
-
-		backBuf->Release();
 	}
 }
 
