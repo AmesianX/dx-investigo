@@ -190,6 +190,7 @@ void InvestigoSingleton::LoadConfig()
 
     const path logFilePath = path(outputDirectory) / "Investigo.log";
     errorLog.open(logFilePath.string());
+	logStream.open("d3dinv.log");
 }
 
 //

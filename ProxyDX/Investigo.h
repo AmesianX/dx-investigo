@@ -84,7 +84,9 @@ public:
     //
     // Get the singleton instance of Investigo.
     //
-    static InvestigoSingleton* Instance();
+	static InvestigoSingleton* Instance();
+
+	static std::ostream& Log() { return Instance()->GetLog(); }
 
     //
     // Init Investigo.
@@ -366,7 +368,12 @@ public:
     //
     // Retreive the error log for writing output.
     //
-    std::ostream& ErrorLog() { return errorLog; }
+	std::ostream& ErrorLog() { return errorLog; }
+
+	//
+	// Retreive the error log for writing output.
+	//
+	std::ostream& GetLog() { return logStream; }
 
 private:
 
@@ -567,6 +574,8 @@ private:
     // Log file for error messages.
     //
     std::ofstream errorLog;
+
+	std::ofstream logStream;
 };
 
 class __TimingID
@@ -621,7 +630,6 @@ struct APICallEventRecorder
 	{
 		boost::unique_lock<boost::mutex> lock(VariableManager::Instance()->GetVariableMutex());
 
-		char fullApiName[1024];
 		sprintf(fullApiName, "%s::%s", className, apiName);
 		VariablePage* dxPage = VariableManager::Instance()->GetRootPage()->GetSubPage("DirectX");
         VariablePage* subPage = dxPage->GetSubPage(fullApiName);
@@ -633,12 +641,25 @@ struct APICallEventRecorder
         InvestigoSingleton::Instance()->RegisterBreakpoint(fullApiName);
 	}
 
+	void log() {
+
+		//FILE * pFile = NULL;
+		//fopen_s(&pFile, "d3dapi.log", "a");
+		//if (pFile != NULL) {
+		//	fputs(fullApiName, pFile);
+		//	fputs("\n", pFile);
+		//	fclose(pFile);
+		//}
+	}
+
+	char fullApiName[1024];
 	Variable* variable;
 };
 
 #define DX_RECORD_API_CALL(className, apiName) \
 	{ \
 		static APICallEventRecorder eventRecorder(#className, #apiName); \
+		eventRecorder.log(); \
 		eventRecorder.variable->Increment(); \
         if (InvestigoSingleton::Instance()->InvokeBreakpoint(#className "::" #apiName)) \
         { \

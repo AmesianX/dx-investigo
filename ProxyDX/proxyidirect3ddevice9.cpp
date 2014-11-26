@@ -18,6 +18,7 @@
 
 #include <time.h>
 #include <sstream>
+#include <iomanip>
 
 using std::stringstream;
 
@@ -581,7 +582,7 @@ HRESULT ProxyIDirect3DDevice9::ColorFill(IDirect3DSurface9* pSurface,CONST RECT*
 HRESULT ProxyIDirect3DDevice9::CreateOffscreenPlainSurface(UINT Width,UINT Height,D3DFORMAT Format,D3DPOOL Pool,IDirect3DSurface9** ppSurface,HANDLE* pSharedHandle)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, CreateOffscreenPlainSurface);
-
+	InvestigoSingleton::Log() << "CreateOffscreenPlainSurface " << Width << " " << Height << std::endl;
 	IDirect3DSurface9* originalSurface = NULL;
 	HRESULT result = original->CreateOffscreenPlainSurface(Width,Height,Format,Pool,&originalSurface,pSharedHandle);
 	if (!FAILED(result) && originalSurface != NULL)
@@ -733,6 +734,12 @@ HRESULT ProxyIDirect3DDevice9::Clear(DWORD Count,CONST D3DRECT* pRects,DWORD Fla
 HRESULT ProxyIDirect3DDevice9::SetTransform(D3DTRANSFORMSTATETYPE State,CONST D3DMATRIX* pMatrix)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, SetTransform);
+	//InvestigoSingleton::Log() << "SetTransform" << std::setprecision(3) << std::fixed << std::endl;
+	//InvestigoSingleton::Log() << pMatrix->_11 << "\t" << pMatrix->_12 << "\t" << pMatrix->_13 << "\t" << pMatrix->_14 << std::endl;
+	//InvestigoSingleton::Log() << pMatrix->_21 << "\t" << pMatrix->_22 << "\t" << pMatrix->_23 << "\t" << pMatrix->_24 << std::endl;
+	//InvestigoSingleton::Log() << pMatrix->_31 << "\t" << pMatrix->_32 << "\t" << pMatrix->_33 << "\t" << pMatrix->_34 << std::endl;
+	//InvestigoSingleton::Log() << pMatrix->_41 << "\t" << pMatrix->_42 << "\t" << pMatrix->_43 << "\t" << pMatrix->_44 << std::endl;
+
     return original->SetTransform(State, pMatrix);
 }
 
@@ -1004,6 +1011,7 @@ HRESULT ProxyIDirect3DDevice9::GetCurrentTexturePalette(UINT *PaletteNumber)
 
 HRESULT ProxyIDirect3DDevice9::SetScissorRect(CONST RECT* pRect)
 {
+	InvestigoSingleton::Log() << "SetScissorRect " << pRect->left << " " << pRect->top << " " << pRect->right << " " << pRect->bottom << std::endl;
     return original->SetScissorRect(pRect);
 }
 
@@ -1326,7 +1334,7 @@ HRESULT ProxyIDirect3DDevice9::GetVertexShaderConstantB(UINT StartRegister,BOOL*
 HRESULT ProxyIDirect3DDevice9::SetStreamSource(UINT StreamNumber,IDirect3DVertexBuffer9* pStreamData,UINT OffsetInBytes,UINT Stride)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, SetStreamSource);
-	
+	//InvestigoSingleton::Log() << "SetStreamSource " << OffsetInBytes << std::endl;
 
 	ProxyIDirect3DVertexBuffer9* proxyStreamData = dynamic_cast<ProxyIDirect3DVertexBuffer9*>(pStreamData); 
 	if (pStreamData != streams[StreamNumber])
@@ -1398,7 +1406,6 @@ HRESULT ProxyIDirect3DDevice9::GetStreamSourceFreq(UINT StreamNumber,UINT* Divid
 HRESULT ProxyIDirect3DDevice9::SetIndices(IDirect3DIndexBuffer9* pIndexData)
 {
 	DX_RECORD_API_CALL(IDirect3DDevice9, SetIndices);
-	
 
 	ProxyIDirect3DIndexBuffer9* pProxyIndexData = dynamic_cast<ProxyIDirect3DIndexBuffer9*>(pIndexData);
 	if (pIndexData != indexBuffer)
